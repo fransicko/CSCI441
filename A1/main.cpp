@@ -5,6 +5,7 @@
  *  File: main.cpp
  *
  *	Author: Michael Villafuerte - Fall 2017
+ f
  *
  *  Description:
  *      this is my heros sign
@@ -107,7 +108,7 @@ GLFWwindow* setupGLFW() {
 void setupOpenGL() {
 	glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );	// set the clear color to black
 }
-// 645 is 80 is allowed for each letter
+// 645 is 64 is allowed for each letter
 
 void drawLetterF() {
 	//draws the F line
@@ -115,8 +116,8 @@ void drawLetterF() {
 	
 	glColor3f(0.529, 0.808, 0.922);
 	glVertex2f(0, 0);
-	glVertex2f(40, 0);
-	glVertex2f(40, 120);
+	glVertex2f(32, 0);
+	glVertex2f(32, 120);
 	glVertex2f(0, 120);
 	glEnd();
 	
@@ -125,8 +126,8 @@ void drawLetterF() {
 	
 	glColor3f(0.529, 0.808, 0.922);
 	glVertex2f(0, 90);
-	glVertex2f(80, 90);
-	glVertex2f(80, 120);
+	glVertex2f(64, 90);
+	glVertex2f(64, 120);
 	glVertex2f(0, 120);
 	glEnd();
 	
@@ -134,9 +135,9 @@ void drawLetterF() {
 	glBegin(GL_QUADS);
 	
 	glColor3f(0.529, 0.808, 0.922);
-	glVertex2f(0, 50);
-	glVertex2f(80, 50);
-	glVertex2f(80, 75);
+	glVertex2f(0, 40);
+	glVertex2f(64, 40);
+	glVertex2f(64, 75);
 	glVertex2f(0, 75);
 	glEnd();
 }
@@ -151,10 +152,332 @@ void drawLetterR() {
 	glVertex2f(20, 120);
 	glVertex2f(0, 120);
 	glEnd();
+	
+	// draws the top line
+	glBegin(GL_QUADS);
+	
+	glColor3f(0.529, 0.808, 0.922);
+	glVertex2f(0, 100);
+	glVertex2f(64, 100);
+	glVertex2f(64, 120);
+	glVertex2f(0, 120);
+	glEnd();
+	
+	// draws the second line
+	glBegin(GL_QUADS);
+	
+	glColor3f(0.529, 0.808, 0.922);
+	glVertex2f(0, 40);
+	glVertex2f(64, 40);
+	glVertex2f(64, 70);
+	glVertex2f(0, 70);
+	glEnd();
+	
+	//Draws the second vertical line
+	glBegin(GL_QUADS);
+	
+	glColor3f(0.529, 0.808, 0.922);
+	glVertex2f(48, 100);
+	glVertex2f(64, 100);
+	glVertex2f(64, 70);
+	glVertex2f(48, 70);
+	glEnd();
+	
+	// The second R line
+	glBegin(GL_QUADS);
+	
+	glColor3f(0.529, 0.808, 0.922);
+	glVertex2f(32, 0);
+	glVertex2f(48, 0);
+	glVertex2f(48, 40);
+	glVertex2f(32, 40);
+	glEnd();	
 }
 
+void drawLetterA() {
+	// draws the outline of the A
+	glBegin(GL_QUADS);
+	
+	glColor3f(0.529, 0.808, 0.922);
+	glVertex2f(0, 0);
+	glVertex2f(64, 0);
+	glVertex2f(64, 120);
+	glVertex2f(0, 120);
+	glEnd();
+	
+	// the center space
+	glBegin(GL_QUADS);
+	
+	glColor3f(0, 0, 0);
+	glVertex2f(16, 0);
+	glVertex2f(48, 0);
+	glVertex2f(48, 55);
+	glVertex2f(16, 55);
+	glEnd();	
+	
+	// the center box
+	glBegin(GL_QUADS);
+	
+	glColor3f(0, 0, 0);
+	glVertex2f(16, 65);
+	glVertex2f(48, 65);
+	glVertex2f(48, 100);
+	glVertex2f(16, 100);
+	glEnd();		
+}
+
+void drawLetterN() {
+	// draws the outline of the N
+	glBegin(GL_QUADS);
+	
+	glColor3f(0.529, 0.808, 0.922);
+	glVertex2f(0, 0);
+	glVertex2f(64, 0);
+	glVertex2f(64, 120);
+	glVertex2f(0, 120);
+	glEnd();
+	
+	// the center space
+	glBegin(GL_QUADS);
+	
+	glColor3f(0, 0, 0);
+	glVertex2f(16, 0);
+	glVertex2f(48, 0);
+	glVertex2f(48, 100);
+	glVertex2f(16, 100);
+	glEnd();		
+}
+
+void drawLetterS() {
+	// draws the outline of the S
+	glBegin(GL_QUADS);
+	
+	glColor3f(0.529, 0.808, 0.922);
+	glVertex2f(0, 0);
+	glVertex2f(64, 0);
+	glVertex2f(64, 120);
+	glVertex2f(0, 120);
+	glEnd();
+	
+	// draws the top line
+	glBegin(GL_QUADS);
+	
+	glColor3f(0, 0, 0);
+	glVertex2f(16, 70);
+	glVertex2f(64, 70);
+	glVertex2f(64, 100);
+	glVertex2f(16, 100);
+	glEnd();
+	
+	// draws the second line
+	glBegin(GL_QUADS);
+	
+	glColor3f(0, 0, 0);
+	glVertex2f(0, 16);
+	glVertex2f(48, 16);
+	glVertex2f(48, 40);
+	glVertex2f(0, 40);
+	glEnd();	
+}
+
+void drawLetterI() {
+	// draws the outline of the I
+	glBegin(GL_QUADS);
+	
+	glColor3f(0.529, 0.808, 0.922);
+	glVertex2f(0, 0);
+	glVertex2f(64, 0);
+	glVertex2f(64, 120);
+	glVertex2f(0, 120);
+	glEnd();
+	
+	// draws the left space
+	glBegin(GL_QUADS);
+	
+	glColor3f(0, 0, 0);
+	glVertex2f(0, 16);
+	glVertex2f(24, 16);
+	glVertex2f(24, 100);
+	glVertex2f(0, 100);
+	glEnd();
+	
+	// draws the right space
+	glBegin(GL_QUADS);
+	
+	glColor3f(0, 0, 0);
+	glVertex2f(40, 16);
+	glVertex2f(64, 16);
+	glVertex2f(64, 100);
+	glVertex2f(40, 100);
+	glEnd();	
+}
+
+void drawLetterC() { 
+	// draws the outline of the C
+	glBegin(GL_QUADS);
+	
+	glColor3f(0.529, 0.808, 0.922);
+	glVertex2f(0, 0);
+	glVertex2f(64, 0);
+	glVertex2f(64, 120);
+	glVertex2f(0, 120);
+	glEnd();
+	
+	// draws the center space
+	glBegin(GL_QUADS);
+	
+	glColor3f(0, 0, 0);
+	glVertex2f(16, 16);
+	glVertex2f(48, 16);
+	glVertex2f(48, 100);
+	glVertex2f(16, 100);
+	glEnd();
+	
+	// draws the opening
+	glBegin(GL_QUADS);
+	
+	glColor3f(0, 0, 0);
+	glVertex2f(48, 32);
+	glVertex2f(64, 32);
+	glVertex2f(64, 64);
+	glVertex2f(48, 64);
+	glEnd();	
+}
+
+void drawLetterK() { 
+	// draws the outline of the K
+	glBegin(GL_QUADS);
+	
+	glColor3f(0.529, 0.808, 0.922);
+	glVertex2f(0, 0);
+	glVertex2f(64, 0);
+	glVertex2f(64, 120);
+	glVertex2f(0, 120);
+	glEnd();
+	
+	// the bottom center space
+	glBegin(GL_QUADS);
+	
+	glColor3f(0, 0, 0);
+	glVertex2f(16, 0);
+	glVertex2f(36, 0);
+	glVertex2f(36, 70);
+	glVertex2f(16, 70);
+	glEnd();
+	
+	// the top center space
+	glBegin(GL_QUADS);
+	
+	glColor3f(0, 0, 0);
+	glVertex2f(16, 95);
+	glVertex2f(36, 95);
+	glVertex2f(36, 120);
+	glVertex2f(16, 120);
+	glEnd();	
+	
+	// draw teh center blank
+	glBegin(GL_QUADS);
+	
+	glColor3f(0, 0, 0);
+	glVertex2f(46, 40);
+	glVertex2f(64, 40);
+	glVertex2f(64, 90);
+	glVertex2f(46, 90);
+	glEnd();		
+	
+}
+
+void drawLetterO() {
+	// draws the outline of the 0
+	glBegin(GL_QUADS);
+	
+	glColor3f(0.529, 0.808, 0.922);
+	glVertex2f(0, 0);
+	glVertex2f(64, 0);
+	glVertex2f(64, 120);
+	glVertex2f(0, 120);
+	glEnd();
+	
+	// draws the center space
+	glBegin(GL_QUADS);
+	
+	glColor3f(0, 0, 0);
+	glVertex2f(16, 16);
+	glVertex2f(48, 16);
+	glVertex2f(48, 100);
+	glVertex2f(16, 100);
+	glEnd();
+}
+
+void drawMyTriangle() {
+	glBegin(GL_TRIANGLES);
+	
+	glColor3f(0.373, 0.620, 0.627);
+	glVertex2f(0, 0);
+	glVertex2f(34, 0);
+	glVertex2f(17, 40);
+	glEnd();
+}
+
+void drawMyCrest() {
+	glm::mat4 transMtx = glm::translate(glm::mat4(), glm::vec3(14, 80, 0));
+	glMultMatrixf(&transMtx[0][0]); {
+		drawMyTriangle();
+	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );
+	
+	// The center piece
+	transMtx = glm::translate(glm::mat4(), glm::vec3(14, 40, 0));
+	glMultMatrixf(&transMtx[0][0]); 
+	glm::mat4 scaleMtx = glm::scale(glm::mat4(), glm::vec3(0.531, 0.333, 1));
+	glMultMatrixf( &scaleMtx[0][0] );{
+		glColor3f(1.000, 0.549, 0.000);
+		drawLetterO();
+	}; glMultMatrixf( &(glm::inverse( scaleMtx ))[0][0] );
+	glMultMatrixf( &(glm::inverse( transMtx ))[0][0] ); 
+	
+	// Bottom triangle rotated
+	transMtx = glm::translate(glm::mat4(), glm::vec3(48, 40, 0));
+	glMultMatrixf(&transMtx[0][0]); 
+	glm::mat4 rotMtx = glm::rotate( glm::mat4(), 160.225f, glm::vec3(0, 0, 1) ); 
+	glMultMatrixf( &rotMtx[0][0] );{
+		drawMyTriangle();
+	}; glMultMatrixf( &(glm::inverse( rotMtx ))[0][0] );
+	glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );
+	
+	// left line
+	transMtx = glm::translate(glm::mat4(), glm::vec3(0, 46, 0));
+	glMultMatrixf(&transMtx[0][0]); {
+		glBegin(GL_QUADS);
+	
+		glColor3f(0.000, 0.545, 0.545);
+		glVertex2f(0, 0);
+		glVertex2f(10, 0);
+		glVertex2f(10, 26);
+		glVertex2f(0, 26);
+		glEnd();
+	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );
+	
+	
+	// right line
+	transMtx = glm::translate(glm::mat4(), glm::vec3(52, 46, 0));
+	glMultMatrixf(&transMtx[0][0]); {
+		glBegin(GL_QUADS);
+	
+		glColor3f(0.180, 0.545, 0.341);
+		glVertex2f(0, 0);
+		glVertex2f(10, 0);
+		glVertex2f(10, 26);
+		glVertex2f(0, 26);
+		glEnd();
+	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );
+	
+	
+	
+}
+
+// The max width allowed for each plus the space
 int space(int i) {
-	return (85 * i) + 5;
+	return (70 * i) + 5;
 }
 //*************************************************************************************
 //
@@ -182,6 +505,63 @@ void renderScene() {
 		drawLetterR();
 		++i;
 	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );
+	
+	// draw A
+	transMtx = glm::translate(glm::mat4(), glm::vec3(space(i), 10, 0));
+	glMultMatrixf(&transMtx[0][0]); {
+		drawLetterA();
+		++i;
+	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );
+	
+	// draw N
+	transMtx = glm::translate(glm::mat4(), glm::vec3(space(i), 10, 0));
+	glMultMatrixf(&transMtx[0][0]); {
+		drawLetterN();
+		++i;
+	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );
+	
+	// draw S
+	transMtx = glm::translate(glm::mat4(), glm::vec3(space(i), 10, 0));
+	glMultMatrixf(&transMtx[0][0]); {
+		drawLetterS();
+		++i;
+	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );
+	
+	// draw I
+	transMtx = glm::translate(glm::mat4(), glm::vec3(space(i), 10, 0));
+	glMultMatrixf(&transMtx[0][0]); {
+		drawLetterI();
+		++i;
+	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );	
+	
+	// draw C
+	transMtx = glm::translate(glm::mat4(), glm::vec3(space(i), 10, 0));
+	glMultMatrixf(&transMtx[0][0]); {
+		drawLetterC();
+		++i;
+	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );		
+	
+	// draw K
+	transMtx = glm::translate(glm::mat4(), glm::vec3(space(i), 10, 0));
+	glMultMatrixf(&transMtx[0][0]); {
+		drawLetterK();
+		++i;
+	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );		
+	
+	// draw O
+	transMtx = glm::translate(glm::mat4(), glm::vec3(space(i), 10, 0));
+	glMultMatrixf(&transMtx[0][0]); {
+		drawLetterO();
+		++i;
+	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );		
+	
+
+	
+	// Draw Crest
+	transMtx = glm::translate(glm::mat4(), glm::vec3(space(i), 10, 0));
+	glMultMatrixf(&transMtx[0][0]); {
+		drawMyCrest();
+	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );		
 
 }
 
