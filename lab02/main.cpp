@@ -71,9 +71,10 @@ float getRand() { return rand() / (float)RAND_MAX; }
 void recomputeOrientation() {
     // TODO #5: Convert spherical coordinates into a cartesian vector
     // see Wednesday's slides for equations.  Extra Hint: Slide #70
-
+	camDir = glm::vec3(cos((double)cameraTheta) * cos((double)cameraPhi), sin((double)cameraPhi), sin((double)cameraTheta) * cos((double)cameraPhi));
 
     // and NORMALIZE this directional vector!!!
+	camDir = glm::normalize(camDir);
 
 }
 
@@ -94,13 +95,31 @@ static void error_callback( int error, const char* description ) {
 }
 
 static void keyboard_callback( GLFWwindow *window, int key, int scancode, int action, int mods ) {
-	if( action == GLFW_PRESS ) {
+	if( action == GLFW_PRESS ||  action == GLFW_REPEAT) {
 		switch( key ) {
 			case GLFW_KEY_ESCAPE:
 			case GLFW_KEY_Q:
 				exit(EXIT_SUCCESS);
+			case GLFW_KEY_W:
+				camPos = camPos + glm::normalize(glm::cross(camDir, glm::vec3(0,1,0)))*((float)2);
+				break;
+			case GLFW_KEY_S:
+				camPos = camPos - glm::normalize(glm::cross(camDir, glm::vec3(0,1,0)))*((float)2);
+				break;
 		}
 	}
+	/*
+	if (action == GLFW_PRESS || action == GLFW_REPEAT) {
+		switch( key ) {
+				exit(EXIT_SUCCESS);
+			case GLFW_KEY_W:
+				camPos = camPos + camDir*((float)2);
+				break;
+			case GLFW_KEY_S:
+				camPos = camPos - camDir*((float)2);
+				break;
+		}
+	}*/
 }
 
 // cursor_callback() ///////////////////////////////////////////////////////////
@@ -114,6 +133,7 @@ static void keyboard_callback( GLFWwindow *window, int key, int scancode, int ac
 ////////////////////////////////////////////////////////////////////////////////
 static void cursor_callback( GLFWwindow *window, double x, double y ) {
 	if( leftMouseButton == GLFW_PRESS ) {
+			cameraTheta = cameraTheta + 0.005*(mousePos.x - x);
 			recomputeOrientation();     // update camera (x,y,z) based on (theta,phi)
 	}
 
@@ -156,9 +176,10 @@ void drawGrid() {
 	
 	// range from -50 to 50 in the x and z, seperate by 10
 	// The spacing of the lines
-	int n = 10;
+	int n = 1;
 	for (float x = -50; x < 50; x+=n) {
 		for (float z = -50; z < 50; z+=n) { // we'll have to draw the squares
+			glColor3f(1, 1, 1);
 			glBegin(GL_LINES);
 			// pair one
 			glVertex3f(x, 0, z);
@@ -196,14 +217,15 @@ void drawCity() {
     // TODO #4: Randomly place buildings of varying heights with random colors
 	
 	// The spacing of the lines
-	int n = 10; 
+	int n = 1; 
 	for (int x = -50; x < 50; x+=n) {
 		for (int z = -50; z < 50; z+=n) { // we'll have to draw the squares
 			if (x%2 == 0 && z%2 == 0 && getRand() < 0.4) {
-				glm::mat4 transCube = glm::translate( glm::mat4(), glm::vec3( x, 0, z ) );
+				int h = (rand() % 10) + 1;
+				int tranH = h/2;
+				glm::mat4 transCube = glm::translate( glm::mat4(), glm::vec3( x, tranH, z ) );
 				glMultMatrixf( &transCube[0][0] ); {
-					/*  NOTE: We need to scale the cube by some value between 1 and 10   */
-					glm::mat4 scaleTri = glm::scale( glm::mat4(), glm::vec3( 1.0f, 10.0f, 1.0f ) );
+					glm::mat4 scaleTri = glm::scale( glm::mat4(), glm::vec3( 1.0f, (float)h, 1.0f ) );
 					glMultMatrixf( &scaleTri[0][0] ); {
 						glColor3f(getRand(), getRand(), getRand());
 						CSCI441::drawSolidCube(1);
@@ -405,8 +427,8 @@ int main( int argc, char *argv[] ) {
 
 		// set up our look at matrix to position our camera
 		// TODO #6: Change how our lookAt matrix gets constructed
-		glm::mat4 viewMtx = glm::lookAt( glm::vec3( 10, 10, 10 ),		// camera is located at (10, 10, 10)
-								 										 glm::vec3(  0,  0,  0 ),		// camera is looking at (0, 0, 0,)
+		glm::mat4 viewMtx = glm::lookAt( camPos,		// camera is located at (10, 10, 10)
+								 										 camDir,		// camera is looking at (0, 0, 0,)
 							 	 									 	 glm::vec3(  0,  1,  0 ) );	// up vector is (0, 1, 0) - positive Y
 		// multiply by the look at matrix - this is the same as our view martix
 		glMultMatrixf( &viewMtx[0][0] );
