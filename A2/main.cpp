@@ -26,6 +26,7 @@
 
 #include <stdio.h>				// for printf functionality
 #include <stdlib.h>				// for exit functionality
+#include <cmath>
 
 // include everything necessary to make our world map work
 // depends upon SOIL library
@@ -39,7 +40,11 @@
 // set to initial values for convenience, but we need variables
 // for later on in case the window gets resized.
 int WINDOW_WIDTH = 512, WINDOW_HEIGHT = 512;
+int HEAD_START = 200, HEAD_MOVE = 1; // The initial position of the head
+int ADDITIONAL_X = 0, ADDITIONAL_Y = 0; // These will be added to the character to change its location
 
+double ScreenRed = 0, ScreenBlue = 0, ScreenGreen = 0; // we will change the color based on the position of the mouse
+double mouseX = 0, mouseY = 0; // this is for the position of the mouse
 //*************************************************************************************
 //
 // Event Callbacks
@@ -51,6 +56,77 @@ static void error_callback(int error, const char* description) {
 //*************************************************************************************
 //
 // Setup Functions
+void moveCharLeft() {
+	if (ADDITIONAL_X == -270) {
+		ADDITIONAL_X = 270;
+		moveLeft();
+	}
+	else ADDITIONAL_X -= 10;
+}
+
+void moveCharRight() {
+	if (ADDITIONAL_X == 270) {
+		ADDITIONAL_X = -270;
+		moveRight();
+	}
+	else ADDITIONAL_X += 10;
+}
+
+void moveCharUp() {
+	if (ADDITIONAL_Y == 310) {
+		ADDITIONAL_Y = -200;
+		moveUp();
+	}
+	else ADDITIONAL_Y += 10;
+}
+
+void moveCharDown() {
+	if (ADDITIONAL_Y == -200) {
+		ADDITIONAL_Y = 310;
+		moveDown();
+	}
+	else ADDITIONAL_Y -= 10;
+}
+
+void keyboard_callback( GLFWwindow *win, int key, int scancode, int action, int mods ) {
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+		exit(EXIT_SUCCESS);
+	}
+	
+	if (key == GLFW_KEY_LEFT && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+		moveCharLeft();
+	}
+	
+	if (key == GLFW_KEY_RIGHT && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+		moveCharRight();
+	}
+	
+	if (key == GLFW_KEY_UP && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+		moveCharUp();
+	}
+	
+	if (key == GLFW_KEY_DOWN && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+		moveCharDown();
+	}
+	
+}
+
+void mouse_button_callback( GLFWwindow *window, int button, int action, int mods ) {
+	double XX = 0, YY = 0;
+	glfwGetCursorPos(window, &XX, &YY);
+	if (button == GLFW_MOUSE_BUTTON_LEFT) {
+		if (action == GLFW_PRESS) {
+			ScreenRed = XX / 512;
+			ScreenGreen = YY / 512;
+			ScreenBlue = (ScreenRed + ScreenGreen) / 2;
+		}
+	}
+}
+
+void cursor_callback( GLFWwindow *window, double x, double y ) {
+	mouseX = x;
+	mouseY = WINDOW_HEIGHT - y;
+}
 
 //
 //  void setupGLFW()
@@ -86,6 +162,9 @@ GLFWwindow* setupGLFW() {
 		fprintf( stdout, "[INFO]: GLFW Window created\n" );
 	}
 
+	glfwSetKeyCallback( window, keyboard_callback);
+	glfwSetMouseButtonCallback( window, mouse_button_callback );
+	glfwSetCursorPosCallback( window, cursor_callback );
 	glfwMakeContextCurrent(window);		// make the created window the current window
 	glfwSwapInterval(1);				// update our window after at least 1 screen refresh
 
@@ -108,10 +187,50 @@ void setupOpenGL() {
 //
 // Rendering / Drawing Functions - this is where the magic happens!
 
+// This will modify the color of the orc based on the mouse position based on when it was clicked
+double colorAdd(double color, char a) {
+	double Screen = 0;
+	switch(a) {
+		case 'r':
+			Screen = ScreenRed;
+		case 'b':
+			Screen = ScreenBlue;
+		case 'g':
+			Screen = ScreenGreen;
+	}
+	
+	if ((Screen+ color) >= 1.0) color = 1.0;
+	else return (Screen + color);
+	
+	return color;
+}
+
+// This is function is to have the eyes follow the mouse.
+double eyePosition(double eye, char axis) {
+	// calculate the difference between hardcoded eye and the mouse.
+	double pos = 0;
+	double dif = 0;
+	switch (axis) {
+		case 'x':
+			pos = mouseX - (HEAD_START + ADDITIONAL_X);
+			break;
+		case 'y':
+			pos = mouseY - (200 + ADDITIONAL_Y);
+			break;
+	}
+	
+	if ((dif = (pos - eye)) <= 5 && dif >= -5) return pos;
+	else if (dif < -5 ) return eye - 5;
+	else if (dif > 5) return eye + 5;
+	
+	return 0;
+}
+
+
 void drawHair() {
 	// Draw the head hair
 	glBegin(GL_TRIANGLES);
-	glColor3f(0.000, 0.000, 0.545);
+	glColor3f(colorAdd(0.000, 'r'), colorAdd(0.000, 'g'), colorAdd(0.545, 'b'));
 	glVertex2f(0, 60);
 	glVertex2f(60, 60);
 	glVertex2f(30, 40);
@@ -119,21 +238,21 @@ void drawHair() {
 	
 	// Draw beard
 	glBegin(GL_TRIANGLES);
-	glColor3f(0.000, 0.000, 0.545);
+	glColor3f(colorAdd(0.000, 'r'), colorAdd(0.000, 'g'), colorAdd(0.545, 'b'));
 	glVertex2f(0, 0);
 	glVertex2f(10, -10);
 	glVertex2f(20, 0);
 	glEnd();
 	
 	glBegin(GL_TRIANGLES);
-	glColor3f(0.000, 0.000, 0.545);
+	glColor3f(colorAdd(0.000, 'r'), colorAdd(0.000, 'g'), colorAdd(0.545, 'b'));
 	glVertex2f(20, 0);
 	glVertex2f(30, -10);
 	glVertex2f(40, 0);
 	glEnd();
 	
 	glBegin(GL_TRIANGLES);
-	glColor3f(0.000, 0.000, 0.545);
+	glColor3f(colorAdd(0.000, 'r'), colorAdd(0.000, 'g'), colorAdd(0.545, 'b'));
 	glVertex2f(40, 0);
 	glVertex2f(50, -10);
 	glVertex2f(60, 0);
@@ -143,7 +262,7 @@ void drawHair() {
 void drawEye() {
 	int radius = 5;
 	glBegin(GL_TRIANGLE_FAN);
-	glColor3f(1.000, 0.549, 0.000);
+	glColor3f(colorAdd(1.000, 'r'), colorAdd(0.549, 'g'), colorAdd(0.000, 'b'));
 	glVertex2f(0, 0);
 	
 	// using a loop to get a circle
@@ -161,12 +280,12 @@ void drawTeeth() {
 	glVertex2f(10, 0);
 	glEnd();
 }
-// radisu*cos(i), radius*sin(i)
+
 void drawHead() {
 	// Draw the head first
 	glBegin(GL_QUADS);
 	
-	glColor3f(0, 0.502, 0);
+	glColor3f(colorAdd(0, 'r'), colorAdd(0.502, 'g'), colorAdd(0, 'b'));
 	glVertex2f(0, 0);
 	glVertex2f(60, 0);
 	glVertex2f(60, 60);
@@ -177,12 +296,15 @@ void drawHead() {
 	drawHair();
 	
 	// draw his eyes
-	glm::mat4 transMtx = glm::translate(glm::mat4(), glm::vec3(15, 30, 0));
+	
+	// Right eye
+	glm::mat4 transMtx = glm::translate(glm::mat4(), glm::vec3(eyePosition(15, 'x'), eyePosition(30, 'y'), 0));
 	glMultMatrixf(&transMtx[0][0]); {
 		drawEye();
 	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );
 	
-	transMtx = glm::translate(glm::mat4(), glm::vec3(45, 30, 0));
+	// left eye
+	transMtx = glm::translate(glm::mat4(), glm::vec3(eyePosition(45, 'x'), eyePosition(30, 'y'), 0));
 	glMultMatrixf(&transMtx[0][0]); {
 		drawEye();
 	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );
@@ -199,21 +321,97 @@ void drawHead() {
 	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );	
 }
 
-void drawBody() {
+void drawArm() {
+	// Arm
+	glBegin(GL_QUADS);
 	
+	glColor3f(colorAdd(0, 'r'), colorAdd(0.502, 'g'), colorAdd(0, 'b'));
+	glVertex2f(0, 0);
+	glVertex2f(30, 0);
+	glVertex2f(30, 100);
+	glVertex2f(0, 100);
+	glEnd();
+	
+	// draw shoulder
+	glBegin(GL_QUADS);
+	
+	glColor3f(0.863, 0.078, 0.235);
+	glVertex2f(0, 100);
+	glVertex2f(30, 100);
+	glVertex2f(30, 140);
+	glVertex2f(0, 140);
+	glEnd();
+}
+
+void drawLeg() {
+	glBegin(GL_QUADS); {
+		glColor3f(0.545, 0.271, 0.075);
+		glVertex2f(0, 0);
+		glVertex2f(30, 0);
+		glVertex2f(30, 90);
+		glVertex2f(0, 90);
+	} glEnd();
+}
+
+void drawBody() {
+	// Body
+	glBegin(GL_QUADS); {
+		glColor3f(0.863, 0.078, 0.235);
+		glVertex2f(0, 0);
+		glVertex2f(70, 0);
+		glVertex2f(70, 100);
+		glVertex2f(0, 100);
+	} glEnd();
+	
+	//draw right arm
+	glm::mat4 transMtx = glm::translate(glm::mat4(), glm::vec3(-30, -40, 0));
+	glMultMatrixf(&transMtx[0][0]); {
+		drawArm();
+	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );
+	
+	//draw left arm
+	transMtx = glm::translate(glm::mat4(), glm::vec3(70, -40, 0));
+	glMultMatrixf(&transMtx[0][0]); {
+		drawArm();
+	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );
+	
+	// draw right leg
+	transMtx = glm::translate(glm::mat4(), glm::vec3(00, -90, 0));
+	glMultMatrixf(&transMtx[0][0]); {
+		drawLeg();
+	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );
+	// draw left leg
+	transMtx = glm::translate(glm::mat4(), glm::vec3(40, -90, 0));
+	glMultMatrixf(&transMtx[0][0]); {
+		drawLeg();
+	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );
+}
+
+// Constant animation
+void headSide() {
+	if (HEAD_START == 185) HEAD_MOVE = -HEAD_MOVE;
+	else if (HEAD_START == 215) HEAD_MOVE = -HEAD_MOVE;
+
+	HEAD_START += HEAD_MOVE;
 }
 
 // Draw character
 void DrawCharacter() {
 	// Draw body before head
+	glm::mat4 transMtx = glm::translate(glm::mat4(), glm::vec3(195 + ADDITIONAL_X, 100 + ADDITIONAL_Y, 0));
+	glMultMatrixf(&transMtx[0][0]); {
+		drawBody();
+	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );
+	
 	// Draw head
-	glm::mat4 transMtx = glm::translate(glm::mat4(), glm::vec3(200, 200, 0));
+	transMtx = glm::translate(glm::mat4(), glm::vec3(HEAD_START + ADDITIONAL_X, 200 + ADDITIONAL_Y, 0));
 	glMultMatrixf(&transMtx[0][0]); {
 		drawHead();
 	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );
 	
-	
 }
+
+
 //
 //	void renderScene()
 //
@@ -251,6 +449,7 @@ int main( int argc, char* argv[] ) {
 	while( !glfwWindowShouldClose(window) ) {
 		glDrawBuffer( GL_BACK );		// ensure we are drawing to the back buffer
 		glClear( GL_COLOR_BUFFER_BIT );	// clear the current color contents in the buffer
+		headSide();
 
 		// update the projection matrix based on the window size
 		// the GL_PROJECTION matrix governs properties of the view coordinates;
