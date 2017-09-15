@@ -1,25 +1,26 @@
 /*
  *  CSCI 441, Computer Graphics, Fall 2017
  *
- *  Project: lab02
+ *  Project: lab03
  *  File: main.cpp
  *
  *	Author: Dr. Jeffrey Paone - Fall 2015
- *	Modified: Michael Villafuerte - Fall 2017 for GLFW
  *
  *  Description:
- *      Contains the base code for a basic flight simulator.
+ *      Contains the base code for 3D Bezier Curve visualizer.
  *
  */
 
+// HEADERS /////////////////////////////////////////////////////////////////////
+
 // include the OpenGL library header
-#ifdef __APPLE__					// if compiling on Mac OS
- 	#include <OpenGL/gl.h>
-#else										// if compiling on Linux or Windows OS
- 	#include <GL/gl.h>
+#ifdef __APPLE__				// if compiling on Mac OS
+#include <OpenGL/gl.h>
+#else							// if compiling on Linux or Windows OS
+#include <GL/gl.h>
 #endif
 
-#include <GLFW/glfw3.h>	// include GLFW framework header
+#include <GLFW/glfw3.h>			// include GLFW framework header
 
 #include <CSCI441/objects.hpp> // for our 3D objects
 
@@ -32,6 +33,10 @@
 #include <stdlib.h>			// for exit functionality
 #include <time.h>			  // for time() functionality
 
+#include <fstream>			// for file I/O
+#include <vector>				// for vector
+using namespace std;
+
 //*************************************************************************************
 //
 // Global Parameters
@@ -42,44 +47,73 @@
 int windowWidth = 640, windowHeight = 480;
 
 int leftMouseButton;    	 									// status of the mouse button
-glm::vec2 mousePos;			              		  // last known X and Y of the mouse
+glm::vec2 mousePosition;				            // last known X and Y of the mouse
 
 glm::vec3 camPos;            							 	// camera position in cartesian coordinates
-float cameraTheta, cameraPhi;               // camera DIRECTION in spherical coordinates
+glm::vec3 camAngles;               					// camera DIRECTION in spherical coordinates stored as (theta, phi, radius)
 glm::vec3 camDir; 			                    // camera DIRECTION in cartesian coordinates
 
-GLuint environmentDL;                       // display list for the 'city'
+vector<glm::vec3> controlPoints;
+float trackPointVal = 0.0f;
+int numSegments = 0;
 
 //*************************************************************************************
 //
-// Helper Functions
+// Helper Function
 
-// getRand() ///////////////////////////////////////////////////////////////////
+// loadControlPoints() /////////////////////////////////////////////////////////
 //
-//  Simple helper function to return a random number between 0.0f and 1.0f.
+//  Load our control points from file and store them in
+//	the global variable controlPoints
 //
 ////////////////////////////////////////////////////////////////////////////////
-float getRand() { return rand() / (float)RAND_MAX; }
+bool loadControlPoints( char* filename ) {
+	// TODO #02: read in control points from file.  Make sure the file can be
+	// opened and handle it appropriately.
+
+	return true;
+}
 
 // recomputeOrientation() //////////////////////////////////////////////////////
 //
 // This function updates the camera's position in cartesian coordinates based
 //  on its position in spherical coordinates. Should be called every time
-//  cameraTheta or cameraPhi is updated.
+//  cameraTheta, cameraPhi, or cameraRadius is updated.
 //
 ////////////////////////////////////////////////////////////////////////////////
 void recomputeOrientation() {
-    // TODO #5: Convert spherical coordinates into a cartesian vector
-    // see Wednesday's slides for equations.  Extra Hint: Slide #70
-	camDir = glm::vec3(sin((double)cameraTheta) * sin((double)cameraPhi), -cos((double)cameraPhi), -cos((double)cameraTheta) * sin((double)cameraPhi));
+    camDir.x =  sinf(camAngles.x)*sinf(camAngles.y);
+    camDir.z = -cosf(camAngles.x)*sinf(camAngles.y);
+    camDir.y = -cosf(camAngles.y);
 
-    // and NORMALIZE this directional vector!!!
-	camDir = glm::normalize(camDir);
+    //and normalize this directional vector!
+    camDir = glm::normalize( camDir );
+}
 
+// evaluateBezierCurve() ////////////////////////////////////////////////////////
+//
+// Computes a location along a Bezier Curve.
+//
+////////////////////////////////////////////////////////////////////////////////
+glm::vec3 evaluateBezierCurve( glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, float t ) {
+	glm::vec3 point(0,0,0);
+
+	// TODO #06: Compute a point along a Bezier curve
+
+	return point;
+}
+
+// renderBezierCurve() //////////////////////////////////////////////////////////
+//
+// Responsible for drawing a Bezier Curve as defined by four control points.
+//  Breaks the curve into n segments as specified by the resolution.
+//
+////////////////////////////////////////////////////////////////////////////////
+void renderBezierCurve( glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, int resolution ) {
+    // TODO #05: Draw the Bezier Curve!
 }
 
 //*************************************************************************************
-//
 // Event Callbacks
 
 //
@@ -95,59 +129,75 @@ static void error_callback( int error, const char* description ) {
 }
 
 static void keyboard_callback( GLFWwindow *window, int key, int scancode, int action, int mods ) {
-	if( action == GLFW_PRESS ||  action == GLFW_REPEAT) {
+	//because the direction vector is unit length, and we probably don't want
+	//to move one full unit every time a button is pressed, just create a constant
+	//to keep track of how far we want to move at each step. you could make
+	//this change w.r.t. the amount of time the button's held down for
+	//simple scale-sensitive movement!
+	float movementConstant = 0.3f;
+
+	if( action == GLFW_PRESS || action == GLFW_REPEAT ) {
 		switch( key ) {
 			case GLFW_KEY_ESCAPE:
 			case GLFW_KEY_Q:
 				exit(EXIT_SUCCESS);
+
+			//move forward!
 			case GLFW_KEY_W:
-				camPos = camPos + camDir*((float)2);
+				//that's as simple as just moving along the direction.
+				camPos.x += camDir.x*movementConstant;
+				camPos.y += camDir.y*movementConstant;
+				camPos.z += camDir.z*movementConstant;
 				break;
+
+			//move backwards!
 			case GLFW_KEY_S:
-				camPos = camPos - camDir*((float)2);
+				//just move BACKWARDS along the direction.
+				camPos.x -= camDir.x*movementConstant;
+				camPos.y -= camDir.y*movementConstant;
+				camPos.z -= camDir.z*movementConstant;
 				break;
 		}
 	}
 }
 
-// cursor_callback() ///////////////////////////////////////////////////////////
 //
-//  GLFW callback for mouse movement. We update cameraPhi and/or cameraTheta
-//      based on how much the user has moved the mouse in the
-//      X or Y directions (in screen space) and whether they have held down
-//      the left or right mouse buttons. If the user hasn't held down any
-//      buttons, the function just updates the last seen mouse X and Y coords.
+//	void cursor_callback
 //
-////////////////////////////////////////////////////////////////////////////////
+//	handles mouse movement.  keeps global state of our mouse cursor.
+//		active motion with left mouse button pans our free cam
+//
 static void cursor_callback( GLFWwindow *window, double x, double y ) {
-	if( leftMouseButton == GLFW_PRESS ) {
-			cameraTheta = cameraTheta + 0.005*(x - mousePos.x);
-			cameraPhi = cameraPhi + 0.005*(mousePos.y - y);
-			if (cameraPhi > M_PI) cameraPhi = M_PI-0.00001;
-			else if (cameraPhi < 0) cameraPhi = 0.00001;
-			recomputeOrientation();     // update camera (x,y,z) based on (theta,phi)
+	if(leftMouseButton == GLFW_PRESS) {
+		camAngles.x += (x - mousePosition.x)*0.005;
+		camAngles.y += (mousePosition.y - y)*0.005;
+
+		// make sure that phi stays within the range (0, M_PI)
+		if(camAngles.y <= 0)
+				camAngles.y = 0+0.001;
+		if(camAngles.y >= M_PI)
+				camAngles.y = M_PI-0.001;
+
+		recomputeOrientation();     //update camera (x,y,z) based on (theta,phi,radius)
 	}
 
-	mousePos.x = x;
-	mousePos.y = y;
+	mousePosition.x = x;
+	mousePosition.y = y;
 }
 
-// mouse_button_callback() /////////////////////////////////////////////////////
 //
-//  GLFW callback for mouse clicks. We save the state of the mouse button
-//      when this is called so that we can check the status of the mouse
-//      buttons inside the motion callback (whether they are up or down).
+//	void mouse_button_callback
 //
-////////////////////////////////////////////////////////////////////////////////
+//	handles mouse clicks.  keeps global state of our left mouse button (pressed or released)
+//
 static void mouse_button_callback( GLFWwindow *window, int button, int action, int mods ) {
 	if( button == GLFW_MOUSE_BUTTON_LEFT ) {
 		leftMouseButton = action;
 	}
 }
 
-//*************************************************************************************
-//
-// Rendering / Drawing Functions - this is where the magic happens!
+
+
 
 // drawGrid() //////////////////////////////////////////////////////////////////
 //
@@ -159,38 +209,22 @@ void drawGrid() {
      *	We will get to why we need to do this when we talk about lighting,
      *	but for now whenever we want to draw something with an OpenGL
      *	Primitive - like a line, quad, point - we need to disable lighting
-     *	and then reenable it for use with the CSCI441 3D Objects.
+     *	and then reenable it for use with the GLUT 3D Primitives.
      */
     glDisable( GL_LIGHTING );
 
-    /** TODO #3: DRAW A GRID IN THE XZ-PLANE USING GL_LINES **/
-	
-	// range from -50 to 50 in the x and z, seperate by 10
-	// The spacing of the lines
-	int n = 1;
-	for (float x = -50; x < 50; x+=n) {
-		for (float z = -50; z < 50; z+=n) { // we'll have to draw the squares
-			glColor3f(1, 1, 1);
-			glBegin(GL_LINES);
-			// pair one
-			glVertex3f(x, 0, z);
-			glVertex3f(x, 0, z+n);
-			
-			// pair two
-			glVertex3f(x, 0, z+n);
-			glVertex3f(x+n, 0, z+n);
-			
-			// pair three
-			glVertex3f(x+n, 0, z+n);
-			glVertex3f(x+n, 0, z);
-			
-			// pair four
-			glVertex3f(x+n, 0, z);
-			glVertex3f(x, 0, z);
-			
-			glEnd();
-		}
-	}
+    // draw our grid....what? triple nested for loops!  crazy!  but it works :)
+    glColor3f( 1, 1, 1 );
+    for( int dir = 0; dir < 2; dir++ ) {
+        for( int i = -5; i < 6; i++ ) {
+            glBegin( GL_LINE_STRIP ); {
+                for( int j = -5; j < 6; j++ )
+                    glVertex3f( dir < 1 ? i : j,
+																0,
+																dir < 1 ? j : i );
+            }; glEnd();
+        }
+    }
 
     /*
      *	As noted above, we are done drawing with OpenGL Primitives, so we
@@ -199,70 +233,24 @@ void drawGrid() {
     glEnable( GL_LIGHTING );
 }
 
-// drawCity() //////////////////////////////////////////////////////////////////
+
+
+// renderScene() ///////////////////////////////////////////////////////////////
 //
-//  Function to draw a random city using CSCI441 3D Cubes
+//  GLUT callback for scene rendering. Sets up the modelview matrix, renders
+//      a scene to the back buffer, and switches the back buffer with the
+//      front buffer (what the user sees).
 //
 ////////////////////////////////////////////////////////////////////////////////
-void drawCity() {
-    // TODO #4: Randomly place buildings of varying heights with random colors
-	
-	// The spacing of the lines
-	int n = 1; 
-	for (int x = -50; x < 50; x+=n) {
-		for (int z = -50; z < 50; z+=n) { // we'll have to draw the squares
-			if (x%2 == 0 && z%2 == 0 && getRand() < 0.4) {
-				int h = (rand() % 10) + 1;
-				int tranH = h/2;
-				glm::mat4 transCube = glm::translate( glm::mat4(), glm::vec3( x, tranH, z ) );
-				glMultMatrixf( &transCube[0][0] ); {
-					glm::mat4 scaleTri = glm::scale( glm::mat4(), glm::vec3( 1.0f, (float)h, 1.0f ) );
-					glMultMatrixf( &scaleTri[0][0] ); {
-						glColor3f(getRand(), getRand(), getRand());
-						CSCI441::drawSolidCube(1);
-					}; glMultMatrixf( &(glm::inverse( scaleTri ))[0][0] );
-				}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
-				
-			}
-			//glBegin(GL_LINES);
-			
-			
-			//glEnd();
-		}
-	}
-}
-
-// generateEnvironmentDL() /////////////////////////////////////////////////////
-//
-//  This function creates a display list with the code to draw a simple
-//      environment for the user to navigate through.
-//
-//  And yes, it uses a global variable for the display list.
-//  I know, I know! Kids: don't try this at home. There's something to be said
-//      for object-oriented programming after all.
-//
-////////////////////////////////////////////////////////////////////////////////
-void generateEnvironmentDL() {
-    // TODO #1 Create a Display List & Call our Drawing Functions
-	environmentDL = glGenLists(1);
-	
-	glNewList( environmentDL, GL_COMPILE);
-	
-	drawCity();
-	drawGrid();
-	
-	glEndList();
-
-}
-
-//
-//	void renderScene()
-//
-//		This method will contain all of the objects to be drawn.
-//
 void renderScene(void)  {
-    // TODO #2: REMOVE TEAPOT & CREATE A CITY SCENE ON A GRID...but call it's display list!
-	glCallList( environmentDL );
+
+	drawGrid();				// first draw our grid
+
+	// TODO #03: Draw our control points
+
+	// TODO #04: Connect our control points
+
+	// TODO #05: Draw the Bezier Curve!
 }
 
 //*************************************************************************************
@@ -294,7 +282,7 @@ GLFWwindow* setupGLFW() {
 	glfwWindowHint( GLFW_RESIZABLE, GLFW_FALSE );		// do not allow our window to be able to be resized
 
 	// create a window for a given size, with a given title
-	GLFWwindow *window = glfwCreateWindow( windowWidth, windowHeight, "Flight Simulator v 0.31", NULL, NULL );
+	GLFWwindow *window = glfwCreateWindow( windowWidth, windowHeight, "Lab03 - Bezier Curve Visualizer", NULL, NULL );
 	if( !window ) {						// if the window could not be created, NULL is returned
 		fprintf( stderr, "[ERROR]: GLFW Window could not be created\n" );
 		glfwTerminate();
@@ -355,22 +343,19 @@ void setupOpenGL() {
 }
 
 //
-//  void setupScene()
+//	setupScene()
 //
-//      Used to setup everything scene related.  Give our camera an
-//	initial starting point and generate the display list for our city
+//	setup everything specific to our scene.  in this case,
+//	position our camera
 //
 void setupScene() {
 	// give the camera a scenic starting point.
-	camPos.x = 60;
-	camPos.y = 40;
-	camPos.z = 30;
-	cameraTheta = -M_PI / 3.0f;
-	cameraPhi = M_PI / 2.8f;
+	camPos.x = 6;
+	camPos.y = 4;
+	camPos.z = 3;
+	camAngles.x = -M_PI / 3.0f;	// theta
+	camAngles.y = M_PI / 2.8f;	// phi
 	recomputeOrientation();
-
-	srand( time(NULL) );	// seed our random number generator
-	generateEnvironmentDL();
 }
 
 ///*************************************************************************************
@@ -383,10 +368,20 @@ void setupScene() {
 //		Really you should know what this is by now.  We will make use of the parameters later
 //
 int main( int argc, char *argv[] ) {
+	// TODO #01: make sure a control point CSV file was passed in.  Then read the points from file
+
 	// GLFW sets up our OpenGL context so must be done first
 	GLFWwindow *window = setupGLFW();	// initialize all of the GLFW specific information releated to OpenGL and our window
 	setupOpenGL();										// initialize all of the OpenGL specific information
 	setupScene();											// initialize objects in our scene
+
+	fprintf(stdout, "[INFO]: /--------------------------------------------------------\\\n");
+	fprintf(stdout, "[INFO]: | OpenGL Information                                     |\n");
+	fprintf(stdout, "[INFO]: |--------------------------------------------------------|\n");
+	fprintf(stdout, "[INFO]: |   OpenGL Version:  %35s |\n", glGetString(GL_VERSION));
+	fprintf(stdout, "[INFO]: |   OpenGL Renderer: %35s |\n", glGetString(GL_RENDERER));
+	fprintf(stdout, "[INFO]: |   OpenGL Vendor:   %35s |\n", glGetString(GL_VENDOR));
+	fprintf(stdout, "[INFO]: \\--------------------------------------------------------/\n");
 
 	//  This is our draw loop - all rendering is done here.  We use a loop to keep the window open
 	//	until the user decides to close the window and quit the program.  Without a loop, the
@@ -417,10 +412,9 @@ int main( int argc, char *argv[] ) {
 		glLoadIdentity();							// set the matrix to be the identity
 
 		// set up our look at matrix to position our camera
-		// TODO #6: Change how our lookAt matrix gets constructed
-		glm::mat4 viewMtx = glm::lookAt( camPos,		// camera is located at (10, 10, 10)
-								 										 camPos+camDir,		// camera is looking at (0, 0, 0,)
-							 	 									 	 glm::vec3(  0,  1,  0 ) );	// up vector is (0, 1, 0) - positive Y
+		glm::mat4 viewMtx = glm::lookAt( camPos,
+								 										 camPos + camDir,
+							 	 									 	 glm::vec3(  0,  1,  0 ) );
 		// multiply by the look at matrix - this is the same as our view martix
 		glMultMatrixf( &viewMtx[0][0] );
 
@@ -428,6 +422,10 @@ int main( int argc, char *argv[] ) {
 
 		glfwSwapBuffers(window);// flush the OpenGL commands and make sure they get rendered!
 		glfwPollEvents();				// check for any events and signal to redraw screen
+
+		trackPointVal += 0.01f;
+		if( trackPointVal > numSegments )
+			trackPointVal = 0.0f;
 	}
 
 	glfwDestroyWindow( window );// clean up and close our window
