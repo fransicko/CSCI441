@@ -1,20 +1,11 @@
-CSCI441, Computer Graphics, Fall 2017
-Dr. Jeffrey paone
+Author: Michael Villafuerte
 
-Code Example: Lab02
+Q1: the image is included in the file: buildings.png
 
-	This program is a simple example of a flight simulator using a free camera
-    model.  The user can move the camera through a city scene as if flying an airplane.
+Q2: 8
 
-Usage: 
-    Pressing 'w' moves the camera forward and pressing 's' moves the camera back.
+Q3: The write-up was good for this lab.
 
-    Left click and dragging the mouse moves the camera around.
+Q4: 5 hours
 
-    The user can also press the 'q' key to quit the program.
-
-Compilation Instructions:
-    Simply navigate to the directory and type 'make.' Only main.cpp needs
-    to be linked with the OpenGL / GLFW / glm libraries.
-
-Notes:
+Q5: No
