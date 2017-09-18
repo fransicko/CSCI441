@@ -50,6 +50,12 @@ glm::vec3 camDir; 			                    // camera DIRECTION in cartesian coordi
 
 GLuint environmentDL;                       // display list for the 'city'
 
+// Assignment 3 Globals
+double r = 10; // radisu
+glm::vec3 carPos = glm::vec3( 0, 2.5, 0 );	// the initial car position in cartesian coords 
+float carTheta = 0;               // car DIRECTION in spherical coordinates
+glm::vec3 carDir;							// car direction in cartesian coords
+
 //*************************************************************************************
 //
 // Helper Functions
@@ -71,10 +77,12 @@ float getRand() { return rand() / (float)RAND_MAX; }
 void recomputeOrientation() {
     // TODO #5: Convert spherical coordinates into a cartesian vector
     // see Wednesday's slides for equations.  Extra Hint: Slide #70
-	camDir = glm::vec3(sin((double)cameraTheta) * sin((double)cameraPhi), -cos((double)cameraPhi), -cos((double)cameraTheta) * sin((double)cameraPhi));
+	camDir = glm::vec3(r*sin((double)cameraTheta) * sin((double)cameraPhi), -r*cos((double)cameraPhi), -r*cos((double)cameraTheta) * sin((double)cameraPhi));
+	carDir = glm::vec3(sin((double)carTheta), 0, cos((double)carTheta));
 
     // and NORMALIZE this directional vector!!!
 	camDir = glm::normalize(camDir);
+	camPos = camDir + glm::vec3(r,r,r) + carPos;
 
 }
 
@@ -101,10 +109,20 @@ static void keyboard_callback( GLFWwindow *window, int key, int scancode, int ac
 			case GLFW_KEY_Q:
 				exit(EXIT_SUCCESS);
 			case GLFW_KEY_W:
-				camPos = camPos + camDir*((float)2);
+				carPos = carPos + carDir;//glm::vec3(1,0,0);//camDir*((float)2);
+				camPos += carDir;//glm::vec3(1,0,0);
 				break;
 			case GLFW_KEY_S:
-				camPos = camPos - camDir*((float)2);
+				carPos = carPos - carDir;//glm::vec3(1,0,0);//camDir*((float)2);
+				camPos -= carDir;//glm::vec3(1,0,0);
+				break;
+			case GLFW_KEY_A:
+				carTheta += M_PI/10;
+				recomputeOrientation();
+				break;
+			case GLFW_KEY_D:
+				carTheta -= M_PI/10;
+				recomputeOrientation();
 				break;
 		}
 	}
@@ -211,7 +229,7 @@ void drawCity() {
 	int n = 5; 
 	for (int x = -50; x < 50; x+=n) {
 		for (int z = -50; z < 50; z+=n) { // we'll have to draw the squares
-			if (x%5 == 0 && z%5 == 0 && getRand() < 0.2 && (z >= -45 && z <= 45) && (x >= -45 && x <= 45)) { // don't want them at the edge
+			if (x%5 == 0 && z%5 == 0 && getRand() < 0.2 && (z >= -45 && z <= 45) && (x >= -45 && x <= 45) && x != 0 && z != 0) { // don't want them at the edge
 				//int h = (rand() % 10) + 1;
 				//int tranH = h/2;
 				glm::mat4 transCube = glm::translate( glm::mat4(), glm::vec3( x, 0, z ) );
@@ -227,6 +245,25 @@ void drawCity() {
 		}
 	}
 }
+
+// These functions will draw the car
+void drawCar() {
+	
+	
+	glm::mat4 transCube = glm::translate( glm::mat4(), carPos );
+	glMultMatrixf( &transCube[0][0] ); {
+		glm::mat4 scaleTri = glm::scale( glm::mat4(), glm::vec3( 1.0f, 1, 1.0f ) );
+		glMultMatrixf( &scaleTri[0][0] ); {
+			glm::mat4 rotTri = glm::rotate( glm::mat4(), carTheta, glm::vec3( 0.0f, 1.0f, 0.0f ) );
+			glMultMatrixf( &rotTri[0][0] ); {
+				// and then scale it 10X in x and 10X in y
+				glColor3f( 1, 1, 1 );
+				CSCI441::drawSolidCube(2);
+			}; glMultMatrixf( &(glm::inverse( rotTri ))[0][0] );
+		}; glMultMatrixf( &(glm::inverse( scaleTri ))[0][0] );
+	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
+}
+
 
 // generateEnvironmentDL() /////////////////////////////////////////////////////
 //
@@ -247,6 +284,9 @@ void generateEnvironmentDL() {
 	drawCity();
 	drawGrid();
 	
+	// drawing the characters vehicle
+	//drawCar();
+	
 	glEndList();
 
 }
@@ -259,6 +299,7 @@ void generateEnvironmentDL() {
 void renderScene(void)  {
     // TODO #2: REMOVE TEAPOT & CREATE A CITY SCENE ON A GRID...but call it's display list!
 	glCallList( environmentDL );
+	drawCar();
 }
 
 //*************************************************************************************
@@ -415,7 +456,7 @@ int main( int argc, char *argv[] ) {
 		// set up our look at matrix to position our camera
 		// TODO #6: Change how our lookAt matrix gets constructed
 		glm::mat4 viewMtx = glm::lookAt( camPos,		// camera is located at (10, 10, 10)
-								 										 camPos+camDir,		// camera is looking at (0, 0, 0,)
+								 										 carPos,		// camera is looking at (0, 0, 0,)
 							 	 									 	 glm::vec3(  0,  1,  0 ) );	// up vector is (0, 1, 0) - positive Y
 		// multiply by the look at matrix - this is the same as our view martix
 		glMultMatrixf( &viewMtx[0][0] );
