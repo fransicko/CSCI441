@@ -1,49 +1,45 @@
 /*
  *  CSCI 441, Computer Graphics, Fall 2017
  *
- *  Project: lab00b
+ *  Project: lab01
  *  File: main.cpp
  *
-<<<<<<< HEAD
  *	Author: Dr. Jeffrey Paone - Fall 2017
-=======
- *	Author: Michael Villafuerte - Fall 2017
->>>>>>> b0d0ba488a893932f5030fda82e74b1382e88dea
  *
  *  Description:
- *      Contains the code for a simple 2D OpenGL / GLFW example.
+ *      Contains the code for a simple interactive and animated example
  *
  */
 
-// include the OpenGL library header
-#ifdef __APPLE__				// if compiling on Mac OS
-	#include <OpenGL/gl.h>
-#else							// if compiling on Linux or Windows OS
-	#include <GL/gl.h>
-#endif
+ // include the OpenGL library header
+ #ifdef __APPLE__				// if compiling on Mac OS
+ 	#include <OpenGL/gl.h>
+ #else							// if compiling on Linux or Windows OS
+ 	#include <GL/gl.h>
+ #endif
 
-#include <GLFW/glfw3.h>			// include GLFW framework header
+ #include <GLFW/glfw3.h>			// include GLFW framework header
 
-// include GLM libraries and matrix functions
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+ // include GLM libraries and matrix functions
+ #include <glm/glm.hpp>
+ #include <glm/gtc/matrix_transform.hpp>
+ #include <glm/gtx/transform.hpp>
 
-#include <stdio.h>				// for printf functionality
-<<<<<<< HEAD
-=======
-#include <math.h>
->>>>>>> b0d0ba488a893932f5030fda82e74b1382e88dea
+ #include <stdio.h>				// for printf functionality
+ #include <stdlib.h>			// for exit functionality
 
-//*************************************************************************************
-//
-// Global Parameters
+ //*************************************************************************************
+ //
+ // Global Parameters
 
-// global variables to keep track of window width and height.
-// set to initial values for convenience, but we need variables
-// for later on in case the window gets resized.
+ // global variables to keep track of window width and height.
+ // set to initial values for convenience, but we need variables
+ // for later on in case the window gets resized.
 int windowWidth = 512, windowHeight = 512;
 
-int windowId;					// global variable to keep track of the window id
+float triforceAngle = 20.0f;
+bool EVIL_TRIFORCE = false;
+double xPosition = 100.0, yPostion = 100.0;
 
 //*************************************************************************************
 //
@@ -61,10 +57,37 @@ static void error_callback( int error, const char* description ) {
 	fprintf( stderr, "[ERROR]: %s\n", description );
 }
 
+/** TODO #1 **/
+
 //*************************************************************************************
 //
 // Setup Functions
+void keyboard_callback( GLFWwindow *win, int key, int scancode, int action, int mods ) {
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+		exit(EXIT_SUCCESS);
+	}
+	
+	if (key == GLFW_KEY_C && action == GLFW_PRESS) {
+		EVIL_TRIFORCE = !(EVIL_TRIFORCE);
+	}
+}
 
+void mouse_button_callback( GLFWwindow *window, int button, int action, int mods ) {
+	if (button == GLFW_MOUSE_BUTTON_LEFT) {
+		if (action == GLFW_PRESS) {
+			EVIL_TRIFORCE = true;
+		}
+		else if (action == GLFW_RELEASE) {
+			EVIL_TRIFORCE = false;
+		}
+	}
+}
+
+void cursor_callback( GLFWwindow *window, double x, double y ) {
+	xPosition = x;
+	yPostion = windowHeight - y;
+}
+ 
 //
 //  void setupGLFW()
 //
@@ -88,20 +111,26 @@ GLFWwindow* setupGLFW() {
 	glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 2 );	// request OpenGL v2.X
 	glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 1 );	// request OpenGL v2.1
 	glfwWindowHint( GLFW_RESIZABLE, GLFW_FALSE );		// do not allow our window to be able to be resized
-
+	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
+	
 	// create a window for a given size, with a given title
-	GLFWwindow *window = glfwCreateWindow( windowWidth, windowHeight, "Lab00B", NULL, NULL );
+	GLFWwindow *window = glfwCreateWindow( windowWidth, windowHeight, "Lab01", NULL, NULL );
 	if( !window ) {						// if the window could not be created, NULL is returned
+		fprintf( stderr, "[ERROR]: GLFW Window could not be created\n" );
 		glfwTerminate();
 		exit( EXIT_FAILURE );
 	} else {
 		fprintf( stdout, "[INFO]: GLFW Window created\n" );
 	}
 
+	// TODO #2
+	glfwSetKeyCallback( window, keyboard_callback);
+	glfwSetMouseButtonCallback( window, mouse_button_callback );
+	glfwSetCursorPosCallback( window, cursor_callback );
 	glfwMakeContextCurrent(window);		// make the created window the current window
-	glfwSwapInterval(1);				// update our window after at least 1 screen refresh
+	glfwSwapInterval(1);				     // update our screen after at least 1 screen refresh
 
-	return window;						// return the window that was created
+	return window;						       // return the window that was created
 }
 
 //
@@ -116,48 +145,63 @@ void setupOpenGL() {
 	glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );	// set the clear color to black
 }
 
-<<<<<<< HEAD
-=======
-void drawMyBlock() {
-	glBegin(GL_TRIANGLE_STRIP);
-	
-	glVertex2f(0, 0);
-	glVertex2f(windowWidth, 0);
-	glVertex2f(0, windowHeight);
-	glVertex2f(windowWidth, windowHeight);
-	glEnd();
-}
-
-void drawMyHalfCircle() {
-	int midWidth = 0, midHeight = 0;
-	int r = 100;
-	double pi = 3.14159265;
-	
-	glBegin(GL_TRIANGLE_FAN);
-	
-	glColor3f(1.000, 1.000, 0.000);
-	glVertex2f(midWidth, midHeight); // base of the sun
-	
-	// The trigs take in radians
-	// Left side of sun
-	glVertex2f(midWidth - r, midHeight);
-	glVertex2f(r*cos(150*pi/180), r*sin(150*pi/180));
-	glVertex2f(r*cos(120*pi/180), r*sin(120*pi/180));
-	
-	// Half way
-	glVertex2f(midWidth, midHeight + r);
-	
-	// Right side of sun
-	glVertex2f(r*cos(60*pi/180), r*sin(60*pi/180));
-	glVertex2f(r*cos(30*pi/180), r*sin(30*pi/180));
-	glVertex2f(r + midWidth, midHeight);
-	
-	glEnd();
-}
->>>>>>> b0d0ba488a893932f5030fda82e74b1382e88dea
 //*************************************************************************************
 //
 // Rendering / Drawing Functions - this is where the magic happens!
+
+//
+//  void drawTriangle()
+//
+//		Issues a series of OpenGL commands to draw a triangle
+//
+void drawTriangle() {
+	// tell OpenGL we want to draw triangles
+	glBegin( GL_TRIANGLES ); {
+		glVertex2f( -2.5f, -2.0f );		// lower left corner
+		glVertex2f(  2.5f, -2.0f );		// lower right corner
+		glVertex2f(  0.0f,  2.0f );		// top corner
+	}; glEnd();	// tell OpenGL we are done drawing triangles
+}
+
+//
+//  void drawTriforce()
+//
+//      Issues a series of OpenGL commands to draw three triangles in a
+//  triangle shape that all fit inside a larger triangle.
+//
+void drawTriforce() {
+	// make all the vertices be a nice, golden color.
+	if (EVIL_TRIFORCE) {
+		glColor3f( 1, 0.0, 0.0 );
+	}
+	else {
+		glColor3f( 0.9, 0.8, 0.1 );
+	}
+
+  // the triangle will get rendered around the origin,
+  // so move the origin to (-2.5, -2.0)
+  glm::mat4 transTri = glm::translate( glm::mat4(), glm::vec3( -2.5f, -2.0f, 0.0f ) );
+  glMultMatrixf( &transTri[0][0] ); {
+		// draw the triangle
+		drawTriangle();
+	}; glMultMatrixf( &(glm::inverse( transTri ))[0][0] );
+
+	// the triangle will get rendered around the origin,
+	// so move the origin to (2.5, -2.0)
+  transTri = glm::translate( glm::mat4(), glm::vec3( 2.5f, -2.0f, 0.0f ) );
+  glMultMatrixf( &transTri[0][0] ); {
+		// draw the triangle
+		drawTriangle();
+	}; glMultMatrixf( &(glm::inverse( transTri ))[0][0] );
+
+  // the triangle will get rendered around the origin,
+	// so move the origin to (0.0, 2.0)
+  transTri = glm::translate( glm::mat4(), glm::vec3( 0.0f, 2.0f, 0.0f ) );
+  glMultMatrixf( &transTri[0][0] ); {
+		// draw the triangle
+		drawTriangle();
+	}; glMultMatrixf( &(glm::inverse( transTri ))[0][0] );
+}
 
 //
 //	void renderScene()
@@ -165,50 +209,24 @@ void drawMyHalfCircle() {
 //		This method will contain all of the objects to be drawn.
 //
 void renderScene() {
-<<<<<<< HEAD
-
-	//*******************************************
-	//***                                     ***
-	//***   YOUR CODE WILL GO HERE            ***
-	//***                                     ***
-	//*******************************************
-
-=======
-	// Draw the sky first
-	glColor3f(0.529, 0.808, 0.922);
-	drawMyBlock();
-	
-	// Then the sun
-	glm::mat4 transMtx = glm::translate(glm::mat4(), glm::vec3(windowWidth / 2, windowHeight / 2, 0));
-	glMultMatrixf(&transMtx[0][0]); {
-		drawMyHalfCircle();
-	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );
-	
-	// The ground
-	glColor3f(0.133, 0.545, 0.133);
-	transMtx = glm::translate(glm::mat4(), glm::vec3(0, -windowHeight / 2, 0));
-	glMultMatrixf(&transMtx[0][0]); {
-		drawMyBlock();
-	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );
-	
-	// The river
-	glColor3f(0.000, 1.000, 1.000);
-	transMtx = glm::translate(glm::mat4(), glm::vec3(0, -3 * windowHeight / 4, 0));
-	glMultMatrixf(&transMtx[0][0]); {
-		drawMyBlock();
-	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );
-	
-	// The ground
-	glColor3f(0.133, 0.545, 0.133);
-	transMtx = glm::translate(glm::mat4(), glm::vec3(0, -7 * windowHeight / 8, 0));
-	glMultMatrixf(&transMtx[0][0]); {
-		drawMyBlock();
-	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );
-	
->>>>>>> b0d0ba488a893932f5030fda82e74b1382e88dea
+  // the triforce will get rendered around the origin,
+	// so move the origin to (200,300)...
+  glm::mat4 transTri = glm::translate( glm::mat4(), glm::vec3( xPosition, yPostion, 0.0f ) );
+  glMultMatrixf( &transTri[0][0] ); {
+    // and then rotate it by 45 degrees
+    glm::mat4 rotTri = glm::rotate( glm::mat4(), triforceAngle, glm::vec3( 0.0f, 0.0f, 1.0f ) );
+    glMultMatrixf( &rotTri[0][0] ); {
+  		// and then scale it 10X in x and 10X in y
+      glm::mat4 scaleTri = glm::scale( glm::mat4(), glm::vec3( 10.0f, 10.0f, 1.0f ) );
+      glMultMatrixf( &scaleTri[0][0] ); {
+    		// finally send OpenGL a series of instructions that render our triforce
+    		drawTriforce();
+      }; glMultMatrixf( &(glm::inverse( scaleTri ))[0][0] );
+    }; glMultMatrixf( &(glm::inverse( rotTri ))[0][0] );
+  }; glMultMatrixf( &(glm::inverse( transTri ))[0][0] );
 }
 
-//*************************************************************************************
+///*************************************************************************************
 //
 // Our main function
 
@@ -226,8 +244,12 @@ int main( int argc, char *argv[] ) {
 	//	until the user decides to close the window and quit the program.  Without a loop, the
 	//	window will display once and then the program exits.
 	while( !glfwWindowShouldClose(window) ) {	// check if the window was instructed to be closed
+    // TODO #3
 		glClear( GL_COLOR_BUFFER_BIT );	// clear the current color contents in the window
 
+		glDrawBuffer(GL_BACK);
+		glClear(GL_COLOR_BUFFER_BIT);
+		triforceAngle = triforceAngle + 0.05f;
 		// update the projection matrix based on the window size
 		// the GL_PROJECTION matrix governs properties of the view coordinates;
 		// i.e. what gets seen - use an Orthographic projection that ranges
@@ -251,7 +273,7 @@ int main( int argc, char *argv[] ) {
 
 		renderScene();					// draw everything to the window
 
-		glfwSwapBuffers(window);		// flush the OpenGL commands and make sure they get rendered!
+		glfwSwapBuffers(window);// flush the OpenGL commands and make sure they get rendered!
 		glfwPollEvents();				// check for any events and signal to redraw screen
 	}
 

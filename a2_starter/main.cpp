@@ -1,38 +1,35 @@
 /*
- *  CSCI 441, Computer Graphics, Fall 2017
+ *  CSCI 441 Computer Graphics, Fall 2017
  *
- *  Project: lab00b
+ *  Project: a2
  *  File: main.cpp
  *
-<<<<<<< HEAD
- *	Author: Dr. Jeffrey Paone - Fall 2017
-=======
- *	Author: Michael Villafuerte - Fall 2017
->>>>>>> b0d0ba488a893932f5030fda82e74b1382e88dea
+ *  Author: Dr. Jeffrey Paone - Fall 2017
  *
  *  Description:
- *      Contains the code for a simple 2D OpenGL / GLFW example.
- *
+ *		This is the shell code for Assignment 2.  It contains predefined
+ *		methods that simply need to be called properly to have your Hero
+ *		move throughout the map.
  */
 
-// include the OpenGL library header
-#ifdef __APPLE__				// if compiling on Mac OS
+#include <GLFW/glfw3.h>		// include GLFW framework header
+
+#ifdef __APPLE__			// if compiling on Mac OS
 	#include <OpenGL/gl.h>
-#else							// if compiling on Linux or Windows OS
+#else						// else compiling on Linux OS
 	#include <GL/gl.h>
 #endif
-
-#include <GLFW/glfw3.h>			// include GLFW framework header
 
 // include GLM libraries and matrix functions
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <stdio.h>				// for printf functionality
-<<<<<<< HEAD
-=======
-#include <math.h>
->>>>>>> b0d0ba488a893932f5030fda82e74b1382e88dea
+#include <stdlib.h>				// for exit functionality
+
+// include everything necessary to make our world map work
+// depends upon SOIL library
+#include "WorldMap.h"
 
 //*************************************************************************************
 //
@@ -41,24 +38,14 @@
 // global variables to keep track of window width and height.
 // set to initial values for convenience, but we need variables
 // for later on in case the window gets resized.
-int windowWidth = 512, windowHeight = 512;
-
-int windowId;					// global variable to keep track of the window id
+int WINDOW_WIDTH = 512, WINDOW_HEIGHT = 512;
 
 //*************************************************************************************
 //
 // Event Callbacks
 
-//
-//	void error_callback( int error, const char* description )
-//
-//		We will register this function as GLFW's error callback.
-//	When an error within GLFW occurs, GLFW will tell us by calling
-//	this function.  We can then print this info to the terminal to
-//	alert the user.
-//
-static void error_callback( int error, const char* description ) {
-	fprintf( stderr, "[ERROR]: %s\n", description );
+static void error_callback(int error, const char* description) {
+	fprintf(stderr, "[ERROR]: %s\n", description);
 }
 
 //*************************************************************************************
@@ -78,22 +65,23 @@ GLFWwindow* setupGLFW() {
 	glfwSetErrorCallback( error_callback );
 
 	// initialize GLFW
-	if( !glfwInit() ) {
+	if (!glfwInit()) {
 		fprintf( stderr, "[ERROR]: Could not initialize GLFW\n" );
-		exit( EXIT_FAILURE );
+		exit(EXIT_FAILURE);
 	} else {
 		fprintf( stdout, "[INFO]: GLFW initialized\n" );
 	}
 
+	glfwWindowHint( GLFW_DOUBLEBUFFER, GLFW_TRUE  );	// use double buffering
 	glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 2 );	// request OpenGL v2.X
 	glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 1 );	// request OpenGL v2.1
 	glfwWindowHint( GLFW_RESIZABLE, GLFW_FALSE );		// do not allow our window to be able to be resized
 
 	// create a window for a given size, with a given title
-	GLFWwindow *window = glfwCreateWindow( windowWidth, windowHeight, "Lab00B", NULL, NULL );
-	if( !window ) {						// if the window could not be created, NULL is returned
+	GLFWwindow *window = glfwCreateWindow( WINDOW_WIDTH, WINDOW_HEIGHT, "Assignment 2", NULL, NULL );
+	if( !window ) {
 		glfwTerminate();
-		exit( EXIT_FAILURE );
+		exit(EXIT_FAILURE);
 	} else {
 		fprintf( stdout, "[INFO]: GLFW Window created\n" );
 	}
@@ -116,45 +104,6 @@ void setupOpenGL() {
 	glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );	// set the clear color to black
 }
 
-<<<<<<< HEAD
-=======
-void drawMyBlock() {
-	glBegin(GL_TRIANGLE_STRIP);
-	
-	glVertex2f(0, 0);
-	glVertex2f(windowWidth, 0);
-	glVertex2f(0, windowHeight);
-	glVertex2f(windowWidth, windowHeight);
-	glEnd();
-}
-
-void drawMyHalfCircle() {
-	int midWidth = 0, midHeight = 0;
-	int r = 100;
-	double pi = 3.14159265;
-	
-	glBegin(GL_TRIANGLE_FAN);
-	
-	glColor3f(1.000, 1.000, 0.000);
-	glVertex2f(midWidth, midHeight); // base of the sun
-	
-	// The trigs take in radians
-	// Left side of sun
-	glVertex2f(midWidth - r, midHeight);
-	glVertex2f(r*cos(150*pi/180), r*sin(150*pi/180));
-	glVertex2f(r*cos(120*pi/180), r*sin(120*pi/180));
-	
-	// Half way
-	glVertex2f(midWidth, midHeight + r);
-	
-	// Right side of sun
-	glVertex2f(r*cos(60*pi/180), r*sin(60*pi/180));
-	glVertex2f(r*cos(30*pi/180), r*sin(30*pi/180));
-	glVertex2f(r + midWidth, midHeight);
-	
-	glEnd();
-}
->>>>>>> b0d0ba488a893932f5030fda82e74b1382e88dea
 //*************************************************************************************
 //
 // Rendering / Drawing Functions - this is where the magic happens!
@@ -165,47 +114,12 @@ void drawMyHalfCircle() {
 //		This method will contain all of the objects to be drawn.
 //
 void renderScene() {
-<<<<<<< HEAD
+	  // draw our World Map to the screen.  this MUST be your first drawing call
+    drawMap( WINDOW_WIDTH, WINDOW_HEIGHT );	// DO NOT REMOVE THIS LINE
 
-	//*******************************************
-	//***                                     ***
-	//***   YOUR CODE WILL GO HERE            ***
-	//***                                     ***
-	//*******************************************
-
-=======
-	// Draw the sky first
-	glColor3f(0.529, 0.808, 0.922);
-	drawMyBlock();
-	
-	// Then the sun
-	glm::mat4 transMtx = glm::translate(glm::mat4(), glm::vec3(windowWidth / 2, windowHeight / 2, 0));
-	glMultMatrixf(&transMtx[0][0]); {
-		drawMyHalfCircle();
-	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );
-	
-	// The ground
-	glColor3f(0.133, 0.545, 0.133);
-	transMtx = glm::translate(glm::mat4(), glm::vec3(0, -windowHeight / 2, 0));
-	glMultMatrixf(&transMtx[0][0]); {
-		drawMyBlock();
-	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );
-	
-	// The river
-	glColor3f(0.000, 1.000, 1.000);
-	transMtx = glm::translate(glm::mat4(), glm::vec3(0, -3 * windowHeight / 4, 0));
-	glMultMatrixf(&transMtx[0][0]); {
-		drawMyBlock();
-	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );
-	
-	// The ground
-	glColor3f(0.133, 0.545, 0.133);
-	transMtx = glm::translate(glm::mat4(), glm::vec3(0, -7 * windowHeight / 8, 0));
-	glMultMatrixf(&transMtx[0][0]); {
-		drawMyBlock();
-	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );
-	
->>>>>>> b0d0ba488a893932f5030fda82e74b1382e88dea
+    //////////////////////////////////////////////////////////
+    /////					Add Your Drawing Here		 /////
+    //////////////////////////////////////////////////////////
 }
 
 //*************************************************************************************
@@ -217,22 +131,25 @@ void renderScene() {
 //
 //		Really you should know what this is by now.  We will make use of the parameters later
 //
-int main( int argc, char *argv[] ) {
+int main( int argc, char* argv[] ) {
 	GLFWwindow *window = setupGLFW();	// initialize all of the GLFW specific information releated to OpenGL and our window
 										// GLFW sets up our OpenGL context so must be done first
 	setupOpenGL();						// initialize all of the OpenGL specific information
 
+	initMap();							// initialize our map
+
 	//  This is our draw loop - all rendering is done here.  We use a loop to keep the window open
 	//	until the user decides to close the window and quit the program.  Without a loop, the
 	//	window will display once and then the program exits.
-	while( !glfwWindowShouldClose(window) ) {	// check if the window was instructed to be closed
-		glClear( GL_COLOR_BUFFER_BIT );	// clear the current color contents in the window
+	while( !glfwWindowShouldClose(window) ) {
+		glDrawBuffer( GL_BACK );		// ensure we are drawing to the back buffer
+		glClear( GL_COLOR_BUFFER_BIT );	// clear the current color contents in the buffer
 
 		// update the projection matrix based on the window size
 		// the GL_PROJECTION matrix governs properties of the view coordinates;
 		// i.e. what gets seen - use an Orthographic projection that ranges
 		// from [0, windowWidth] in X and [0, windowHeight] in Y. (0,0) is the lower left.
-		glm::mat4 projMtx = glm::ortho( 0.0f, (GLfloat)windowWidth, 0.0f, (GLfloat)windowHeight );
+		glm::mat4 projMtx = glm::ortho( 0.0f, (GLfloat)WINDOW_WIDTH, 0.0f, (GLfloat)WINDOW_HEIGHT );
 		glMatrixMode( GL_PROJECTION );	// change to the Projection matrix
 		glLoadIdentity();				// set the matrix to be the identity
 		glMultMatrixf( &projMtx[0][0] );// load our orthographic projection matrix into OpenGL's projection matrix state
@@ -255,8 +172,5 @@ int main( int argc, char *argv[] ) {
 		glfwPollEvents();				// check for any events and signal to redraw screen
 	}
 
-	glfwDestroyWindow( window );		// clean up and close our window
-	glfwTerminate();					// shut down GLFW to clean up our context
-
-	return EXIT_SUCCESS;				// exit our program successfully!
+	return 0;
 }

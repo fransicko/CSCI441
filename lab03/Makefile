@@ -21,20 +21,13 @@
 ##
 ########################################
 
-TARGET = lab00a
+TARGET = lab03
 OBJECTS = main.o
 
-<<<<<<< HEAD
-LOCAL_INC_PATH = /home/fransicko/CSCI441/include
-LOCAL_LIB_PATH = /home/fransicko/CSCI441/lib
-
-BUILDING_IN_LAB = 0
-=======
 LOCAL_INC_PATH = /Users/jpaone/Desktop/include
 LOCAL_LIB_PATH = /Users/jpaone/Desktop/lib
 
 BUILDING_IN_LAB = 1
->>>>>>> b0d0ba488a893932f5030fda82e74b1382e88dea
 
 #########################################################################################
 #########################################################################################
@@ -87,11 +80,7 @@ else
 
 	# Linux and all other builds
 	else
-<<<<<<< HEAD
-		LIBS += -lGL -lglfw
-=======
 		LIBS += -lGL -lglfw3
->>>>>>> b0d0ba488a893932f5030fda82e74b1382e88dea
 	endif
 endif
 
