@@ -4,7 +4,11 @@
  *  Project: lab00b
  *  File: main.cpp
  *
+<<<<<<< HEAD
+ *	Author: Dr. Jeffrey Paone - Fall 2017
+=======
  *	Author: Michael Villafuerte - Fall 2017
+>>>>>>> b0d0ba488a893932f5030fda82e74b1382e88dea
  *
  *  Description:
  *      Contains the code for a simple 2D OpenGL / GLFW example.
@@ -25,7 +29,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <stdio.h>				// for printf functionality
+<<<<<<< HEAD
+=======
 #include <math.h>
+>>>>>>> b0d0ba488a893932f5030fda82e74b1382e88dea
 
 //*************************************************************************************
 //
@@ -109,6 +116,8 @@ void setupOpenGL() {
 	glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );	// set the clear color to black
 }
 
+<<<<<<< HEAD
+=======
 void drawMyBlock() {
 	glBegin(GL_TRIANGLE_STRIP);
 	
@@ -145,6 +154,7 @@ void drawMyHalfCircle() {
 	
 	glEnd();
 }
+>>>>>>> b0d0ba488a893932f5030fda82e74b1382e88dea
 //*************************************************************************************
 //
 // Rendering / Drawing Functions - this is where the magic happens!
@@ -155,6 +165,15 @@ void drawMyHalfCircle() {
 //		This method will contain all of the objects to be drawn.
 //
 void renderScene() {
+<<<<<<< HEAD
+
+	//*******************************************
+	//***                                     ***
+	//***   YOUR CODE WILL GO HERE            ***
+	//***                                     ***
+	//*******************************************
+
+=======
 	// Draw the sky first
 	glColor3f(0.529, 0.808, 0.922);
 	drawMyBlock();
@@ -186,6 +205,7 @@ void renderScene() {
 		drawMyBlock();
 	}; glMultMatrixf( &(glm::inverse( transMtx ))[0][0] );
 	
+>>>>>>> b0d0ba488a893932f5030fda82e74b1382e88dea
 }
 
 //*************************************************************************************
