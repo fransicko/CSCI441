@@ -52,9 +52,11 @@ GLuint environmentDL;                       // display list for the 'city'
 
 // Assignment 3 Globals
 double r = 10; // radisu
-glm::vec3 carPos = glm::vec3( 0, 2.5, 0 );	// the initial car position in cartesian coords 
+glm::vec3 carPos = glm::vec3( 0, 1, 0 );	// the initial car position in cartesian coords 
 float carTheta = 0;               // car DIRECTION in spherical coordinates
 glm::vec3 carDir;							// car direction in cartesian coords
+float wheelAngle = 0;
+bool ctrlPress = false;
 
 //*************************************************************************************
 //
@@ -81,8 +83,9 @@ void recomputeOrientation() {
 	carDir = glm::vec3(sin((double)carTheta), 0, cos((double)carTheta));
 
     // and NORMALIZE this directional vector!!!
+	camPos = camDir + carPos;/*glm::vec3(r,r,r) +*/ 
 	camDir = glm::normalize(camDir);
-	camPos = camDir + glm::vec3(r,r,r) + carPos;
+	
 
 }
 
@@ -110,11 +113,25 @@ static void keyboard_callback( GLFWwindow *window, int key, int scancode, int ac
 				exit(EXIT_SUCCESS);
 			case GLFW_KEY_W:
 				carPos = carPos + carDir;//glm::vec3(1,0,0);//camDir*((float)2);
-				camPos += carDir;//glm::vec3(1,0,0);
+				if (carPos.x > 48) {carPos.x = 48;}
+				if (carPos.z > 48) {carPos.z = 48;}
+				if (carPos.x < -48) {carPos.x = -48;}
+				if (carPos.z < -48) {carPos.z = -48;}
+				
+				//camPos += carDir;//glm::vec3(1,0,0);
+				recomputeOrientation();
+				wheelAngle -= M_PI/3;
 				break;
 			case GLFW_KEY_S:
 				carPos = carPos - carDir;//glm::vec3(1,0,0);//camDir*((float)2);
-				camPos -= carDir;//glm::vec3(1,0,0);
+				if (carPos.x > 48) {carPos.x = 48;}
+				if (carPos.z > 48) {carPos.z = 48;}
+				if (carPos.x < -48) {carPos.x = -48;}
+				if (carPos.z < -48) {carPos.z = -48;}
+				
+				//camPos -= carDir;//glm::vec3(1,0,0);
+				recomputeOrientation();
+				wheelAngle += M_PI/3;
 				break;
 			case GLFW_KEY_A:
 				carTheta += M_PI/10;
@@ -126,6 +143,9 @@ static void keyboard_callback( GLFWwindow *window, int key, int scancode, int ac
 				break;
 		}
 	}
+	
+	if ((action == GLFW_PRESS ||  action == GLFW_REPEAT) && (key == GLFW_KEY_RIGHT_CONTROL || key == GLFW_KEY_LEFT_CONTROL)) ctrlPress = true;
+	else ctrlPress = false;
 }
 
 // cursor_callback() ///////////////////////////////////////////////////////////
@@ -138,13 +158,18 @@ static void keyboard_callback( GLFWwindow *window, int key, int scancode, int ac
 //
 ////////////////////////////////////////////////////////////////////////////////
 static void cursor_callback( GLFWwindow *window, double x, double y ) {
-	if( leftMouseButton == GLFW_PRESS ) {
-			cameraTheta = cameraTheta + 0.005*(x - mousePos.x);
-			cameraPhi = cameraPhi + 0.005*(mousePos.y - y);
-			if (cameraPhi > M_PI) cameraPhi = M_PI-0.00001;
-			else if (cameraPhi < 0) cameraPhi = 0.00001;
-			recomputeOrientation();     // update camera (x,y,z) based on (theta,phi)
+	if( leftMouseButton == GLFW_PRESS && !ctrlPress) {
+		cameraTheta = cameraTheta + 0.005*(x - mousePos.x);
+		cameraPhi = cameraPhi + 0.005*(mousePos.y - y);
+		if (cameraPhi > M_PI) cameraPhi = M_PI-0.00001;
+		else if (cameraPhi < M_PI/2) cameraPhi = (M_PI/2) - 0.00001;
+		recomputeOrientation();     // update camera (x,y,z) based on (theta,phi)
 	}
+	else if( leftMouseButton == GLFW_PRESS && ctrlPress) {
+		r = r + 0.005*(x - mousePos.x);
+		recomputeOrientation();     // update camera (x,y,z) based on (theta,phi)
+	}
+		
 
 	mousePos.x = x;
 	mousePos.y = y;
@@ -246,10 +271,169 @@ void drawCity() {
 	}
 }
 
+void drawWheels() {
+	// draw the wheels
+	// front right 
+	glm::mat4 transCube = glm::translate( glm::mat4(), glm::vec3(1, -0.8, 1) );
+	glMultMatrixf( &transCube[0][0] ); {
+		glm::mat4 scaleTri = glm::scale( glm::mat4(), glm::vec3( 1.0f, 1, 1.0f ) );
+		glMultMatrixf( &scaleTri[0][0] ); {
+			glm::mat4 rotTri = glm::rotate( glm::mat4(), (float)(M_PI/2), glm::vec3( 0.0f, 1.0f, 0.0f ) );
+			glMultMatrixf( &rotTri[0][0] ); {
+				glm::mat4 rotTri = glm::rotate( glm::mat4(), wheelAngle, glm::vec3( 0.0f, 0.0f, 1.0f ) );
+				glMultMatrixf( &rotTri[0][0] ); {
+					// and then scale it 10X in x and 10X in y
+					glColor3f( 	0.545, 0.271, 0.075);
+					CSCI441::drawSolidTorus( 0.15, 0.25, 4, 4 );
+				}; glMultMatrixf( &(glm::inverse( rotTri ))[0][0] );
+			}; glMultMatrixf( &(glm::inverse( rotTri ))[0][0] );
+		}; glMultMatrixf( &(glm::inverse( scaleTri ))[0][0] );
+	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
+	
+	// back wheel
+	transCube = glm::translate( glm::mat4(), glm::vec3(-1, -0.8, -1) );
+	glMultMatrixf( &transCube[0][0] ); {
+		glm::mat4 scaleTri = glm::scale( glm::mat4(), glm::vec3( 1.0f, 1, 1.0f ) );
+		glMultMatrixf( &scaleTri[0][0] ); {
+			glm::mat4 rotTri = glm::rotate( glm::mat4(), (float)(M_PI/2), glm::vec3( 0.0f, 1.0f, 0.0f ) );
+			glMultMatrixf( &rotTri[0][0] ); {
+				glm::mat4 rotTri = glm::rotate( glm::mat4(), wheelAngle, glm::vec3( 0.0f, 0.0f, 1.0f ) );
+				glMultMatrixf( &rotTri[0][0] ); {
+					// and then scale it 10X in x and 10X in y
+					glColor3f( 	0.545, 0.271, 0.075);
+					CSCI441::drawSolidTorus( 0.15, 0.25, 4, 4 );
+				}; glMultMatrixf( &(glm::inverse( rotTri ))[0][0] );
+			}; glMultMatrixf( &(glm::inverse( rotTri ))[0][0] );
+		}; glMultMatrixf( &(glm::inverse( scaleTri ))[0][0] );
+	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
+	
+	transCube = glm::translate( glm::mat4(), glm::vec3(1, -0.8, -1) );
+	glMultMatrixf( &transCube[0][0] ); {
+		glm::mat4 scaleTri = glm::scale( glm::mat4(), glm::vec3( 1.0f, 1, 1.0f ) );
+		glMultMatrixf( &scaleTri[0][0] ); {
+			glm::mat4 rotTri = glm::rotate( glm::mat4(), (float)(M_PI/2), glm::vec3( 0.0f, 1.0f, 0.0f ) );
+			glMultMatrixf( &rotTri[0][0] ); {
+				glm::mat4 rotTri = glm::rotate( glm::mat4(), wheelAngle, glm::vec3( 0.0f, 0.0f, 1.0f ) );
+				glMultMatrixf( &rotTri[0][0] ); {
+					// and then scale it 10X in x and 10X in y
+					glColor3f( 	0.545, 0.271, 0.075);
+					CSCI441::drawSolidTorus( 0.15, 0.25, 4, 4 );
+				}; glMultMatrixf( &(glm::inverse( rotTri ))[0][0] );
+			}; glMultMatrixf( &(glm::inverse( rotTri ))[0][0] );
+		}; glMultMatrixf( &(glm::inverse( scaleTri ))[0][0] );
+	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
+	
+	transCube = glm::translate( glm::mat4(), glm::vec3(-1, -0.8, 1) );
+	glMultMatrixf( &transCube[0][0] ); {
+		glm::mat4 scaleTri = glm::scale( glm::mat4(), glm::vec3( 1.0f, 1, 1.0f ) );
+		glMultMatrixf( &scaleTri[0][0] ); {
+			glm::mat4 rotTri = glm::rotate( glm::mat4(), (float)(M_PI/2), glm::vec3( 0.0f, 1.0f, 0.0f ) );
+			glMultMatrixf( &rotTri[0][0] ); {
+				glm::mat4 rotTri = glm::rotate( glm::mat4(), wheelAngle, glm::vec3( 0.0f, 0.0f, 1.0f ) );
+				glMultMatrixf( &rotTri[0][0] ); {
+					// and then scale it 10X in x and 10X in y
+					glColor3f( 	0.545, 0.271, 0.075);
+					CSCI441::drawSolidTorus( 0.15, 0.25, 4, 4 );
+				}; glMultMatrixf( &(glm::inverse( rotTri ))[0][0] );
+			}; glMultMatrixf( &(glm::inverse( rotTri ))[0][0] );
+		}; glMultMatrixf( &(glm::inverse( scaleTri ))[0][0] );
+	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
+}
+
+// draw spikes
+void drawSpikes() {
+	// top spike
+	glm::mat4 transCube = glm::translate( glm::mat4(), glm::vec3( 0, 1, 0 ) );
+	glMultMatrixf( &transCube[0][0] ); {
+		glm::mat4 scaleTri = glm::scale( glm::mat4(), glm::vec3( 1.0f, 1.0f, 1.0f ) );
+		glMultMatrixf( &scaleTri[0][0] ); {
+			glColor3f( 1, 0, 0);
+			CSCI441::drawSolidCone( 1, 1, 2, 6 ) ;
+		}; glMultMatrixf( &(glm::inverse( scaleTri ))[0][0] );
+	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
+	
+	// left side spike
+	transCube = glm::translate( glm::mat4(), glm::vec3(1,0,0) );
+	glMultMatrixf( &transCube[0][0] ); {
+		glm::mat4 scaleTri = glm::scale( glm::mat4(), glm::vec3( 1.0f, 1, 1.0f ) );
+		glMultMatrixf( &scaleTri[0][0] ); {
+			glm::mat4 rotTri = glm::rotate( glm::mat4(), (float)M_PI*3.0f/2.0f, glm::vec3( 0.0f, 0.0f, 1.0f ) );
+			glMultMatrixf( &rotTri[0][0] ); {
+				// and then scale it 10X in x and 10X in y
+				glColor3f( 1, 0, 0);
+				CSCI441::drawSolidCone( 1, 1, 2, 6 ) ;
+			}; glMultMatrixf( &(glm::inverse( rotTri ))[0][0] );
+		}; glMultMatrixf( &(glm::inverse( scaleTri ))[0][0] );
+	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
+	
+	// right side spike
+	transCube = glm::translate( glm::mat4(), glm::vec3(-1,0,0) );
+	glMultMatrixf( &transCube[0][0] ); {
+		glm::mat4 scaleTri = glm::scale( glm::mat4(), glm::vec3( 1.0f, 1, 1.0f ) );
+		glMultMatrixf( &scaleTri[0][0] ); {
+			glm::mat4 rotTri = glm::rotate( glm::mat4(), (float)M_PI/2.0f, glm::vec3( 0.0f, 0.0f, 1.0f ) );
+			glMultMatrixf( &rotTri[0][0] ); {
+				// and then scale it 10X in x and 10X in y
+				glColor3f( 1, 0, 0);
+				CSCI441::drawSolidCone( 1, 1, 2, 6 ) ;
+			}; glMultMatrixf( &(glm::inverse( rotTri ))[0][0] );
+		}; glMultMatrixf( &(glm::inverse( scaleTri ))[0][0] );
+	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
+	
+	// front spike
+	transCube = glm::translate( glm::mat4(), glm::vec3(0,0,1) );
+	glMultMatrixf( &transCube[0][0] ); {
+		glm::mat4 scaleTri = glm::scale( glm::mat4(), glm::vec3( 1.0f, 1, 1.0f ) );
+		glMultMatrixf( &scaleTri[0][0] ); {
+			glm::mat4 rotTri = glm::rotate( glm::mat4(), (float)M_PI/2.0f, glm::vec3( 1.0f, 0.0f, 0.0f ) );
+			glMultMatrixf( &rotTri[0][0] ); {
+				// and then scale it 10X in x and 10X in y
+				glColor3f( 1, 0, 0);
+				CSCI441::drawSolidCone( 1, 1, 2, 6 ) ;
+			}; glMultMatrixf( &(glm::inverse( rotTri ))[0][0] );
+		}; glMultMatrixf( &(glm::inverse( scaleTri ))[0][0] );
+	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
+	
+	// back spike
+	transCube = glm::translate( glm::mat4(), glm::vec3(0,0,-1) );
+	glMultMatrixf( &transCube[0][0] ); {
+		glm::mat4 scaleTri = glm::scale( glm::mat4(), glm::vec3( 1.0f, 1, 1.0f ) );
+		glMultMatrixf( &scaleTri[0][0] ); {
+			glm::mat4 rotTri = glm::rotate( glm::mat4(), (float)M_PI*3.0f/2.0f, glm::vec3( 1.0f, 0.0f, 0.0f ) );
+			glMultMatrixf( &rotTri[0][0] ); {
+				// and then scale it 10X in x and 10X in y
+				glColor3f( 1, 0, 0);
+				CSCI441::drawSolidCone( 1, 1, 2, 6 ) ;
+			}; glMultMatrixf( &(glm::inverse( rotTri ))[0][0] );
+		}; glMultMatrixf( &(glm::inverse( scaleTri ))[0][0] );
+	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
+	
+	
+}
+
+void drawCube() {
+	glm::mat4 transCube = glm::translate( glm::mat4(), glm::vec3(0, 0, 0) );
+	glMultMatrixf( &transCube[0][0] ); {
+		glm::mat4 scaleTri = glm::scale( glm::mat4(), glm::vec3( 1.0f, 1, 1.0f ) );
+		glMultMatrixf( &scaleTri[0][0] ); {
+				// and then scale it 10X in x and 10X in y
+				glColor3f( 0.184, 0.310, 0.310);
+				CSCI441::drawSolidCube(2);
+				
+				// draw the wheels
+				drawWheels();
+				
+				// draw the spikes
+				drawSpikes();
+		}; glMultMatrixf( &(glm::inverse( scaleTri ))[0][0] );
+	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
+	
+	// draw the spikes
+	
+}
+
 // These functions will draw the car
 void drawCar() {
-	
-	
 	glm::mat4 transCube = glm::translate( glm::mat4(), carPos );
 	glMultMatrixf( &transCube[0][0] ); {
 		glm::mat4 scaleTri = glm::scale( glm::mat4(), glm::vec3( 1.0f, 1, 1.0f ) );
@@ -257,8 +441,7 @@ void drawCar() {
 			glm::mat4 rotTri = glm::rotate( glm::mat4(), carTheta, glm::vec3( 0.0f, 1.0f, 0.0f ) );
 			glMultMatrixf( &rotTri[0][0] ); {
 				// and then scale it 10X in x and 10X in y
-				glColor3f( 1, 1, 1 );
-				CSCI441::drawSolidCube(2);
+				drawCube();
 			}; glMultMatrixf( &(glm::inverse( rotTri ))[0][0] );
 		}; glMultMatrixf( &(glm::inverse( scaleTri ))[0][0] );
 	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
