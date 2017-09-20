@@ -35,6 +35,9 @@
 
 #include <fstream>			// for file I/O
 #include <vector>				// for vector
+#include <iostream>
+#include <sstream>
+#include <string>
 using namespace std;
 
 //*************************************************************************************
@@ -70,6 +73,27 @@ int numSegments = 0;
 bool loadControlPoints( char* filename ) {
 	// TODO #02: read in control points from file.  Make sure the file can be
 	// opened and handle it appropriately.
+	std::ifstream data(filename);
+	std::string line;
+	int count;
+	//This is is to read in the number of points
+	data >> count;
+	cout << count << endl;
+	std::getline(data,line); // read to the next line
+	for (int i = 0; i < count; ++i) {
+		std::getline(data,line); // read in the line
+		std::stringstream ss(line);
+		std::string cell;
+		
+		vector<int> values;
+		for (int j = 0; j < 3; ++j) {
+			std::getline(ss, cell, ',');
+			cout << cell << endl;
+			values.push_back( atoi(cell.c_str()) );
+		}
+		
+		controlPoints.push_back(glm::vec3(values.at(0), values.at(1), values.at(2)));
+	}
 
 	return true;
 }
@@ -369,6 +393,14 @@ void setupScene() {
 //
 int main( int argc, char *argv[] ) {
 	// TODO #01: make sure a control point CSV file was passed in.  Then read the points from file
+	
+	if (argc != 2) {
+		std::cerr << "No csv was specified." << endl;
+		return -1;
+	}
+	else {
+		loadControlPoints(argv[1]);
+	}
 
 	// GLFW sets up our OpenGL context so must be done first
 	GLFWwindow *window = setupGLFW();	// initialize all of the GLFW specific information releated to OpenGL and our window
