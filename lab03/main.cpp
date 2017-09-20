@@ -271,9 +271,15 @@ void renderScene(void)  {
 	drawGrid();				// first draw our grid
 
 	// TODO #03: Draw our control points
-
+	for (std::size_t i = 0; i < controlPoints.size(); ++i) {
+		glm::mat4 transCube = glm::translate( glm::mat4(), controlPoints.at(i));
+		glMultMatrixf( &transCube[0][0] ); {
+			glColor3f( 0, 1, 0);
+			CSCI441::drawSolidSphere( 0.5, 4, 5 );
+		}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
+	}
 	// TODO #04: Connect our control points
-
+	
 	// TODO #05: Draw the Bezier Curve!
 }
 
