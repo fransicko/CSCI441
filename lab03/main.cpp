@@ -75,12 +75,12 @@ bool loadControlPoints( char* filename ) {
 	// opened and handle it appropriately.
 	std::ifstream data(filename);
 	std::string line;
-	int count;
+	
 	//This is is to read in the number of points
-	data >> count;
-	cout << count << endl;
+	data >> numSegments;
+	//cout << numSegments << endl;
 	std::getline(data,line); // read to the next line
-	for (int i = 0; i < count; ++i) {
+	for (int i = 0; i < numSegments; ++i) {
 		std::getline(data,line); // read in the line
 		std::stringstream ss(line);
 		std::string cell;
@@ -88,7 +88,7 @@ bool loadControlPoints( char* filename ) {
 		vector<int> values;
 		for (int j = 0; j < 3; ++j) {
 			std::getline(ss, cell, ',');
-			cout << cell << endl;
+			//cout << cell << endl;
 			values.push_back( atoi(cell.c_str()) );
 		}
 		
@@ -123,6 +123,7 @@ glm::vec3 evaluateBezierCurve( glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::ve
 	glm::vec3 point(0,0,0);
 
 	// TODO #06: Compute a point along a Bezier curve
+	point = pow((1-t), 3)*p0 + 3*pow((1-t), 2)*t*p1 + 3*(1-t)*pow(t, 2)*p2 + pow(t,3)*p3;
 
 	return point;
 }
@@ -135,6 +136,15 @@ glm::vec3 evaluateBezierCurve( glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::ve
 ////////////////////////////////////////////////////////////////////////////////
 void renderBezierCurve( glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, int resolution ) {
     // TODO #05: Draw the Bezier Curve!
+	float step = (float)1/(float)resolution ;
+	glColor3f(0, 0, 1);
+	glLineWidth(6.0);
+	glBegin( GL_LINE_STRIP ); {
+		for (float i = 0; i <= 1.0f+step; i+=step) {
+			glm::vec3 point = evaluateBezierCurve( p0, p1, p2, p3, i );
+			glVertex3f(point.x, point.y, point.z);
+		}
+	}; glEnd();
 }
 
 //*************************************************************************************
@@ -279,8 +289,21 @@ void renderScene(void)  {
 		}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
 	}
 	// TODO #04: Connect our control points
+	glColor3f(1.000, 1.000, 0.000);
+	glLineWidth(6.0);
+	glBegin( GL_LINE_STRIP ); {
+		for (int i = 0; i < numSegments; ++i) {
+			glVertex3f(controlPoints.at(i).x, controlPoints.at(i).y, controlPoints.at(i).z);
+		}
+	}; glEnd();
+	
 	
 	// TODO #05: Draw the Bezier Curve!
+	for (int i = 0; i < numSegments-1; i+=3) {
+			renderBezierCurve( controlPoints.at(i), controlPoints.at(i+1), controlPoints.at(i+2), 
+							controlPoints.at(i+3), 100 );
+	}
+	
 }
 
 //*************************************************************************************
