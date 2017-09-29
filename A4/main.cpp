@@ -69,6 +69,13 @@ vector<glm::vec3> controlPoints;
 float trackPointVal = 0.0f;
 int numSegments = 0;
 
+vector<glm::vec3> controlPath;	// This will be the the path that the mascot will take
+glm::vec3 controlPoint;					// This will b the point on the path of the curve
+int path = 0;								// the value in the array of points to look at, I.E. i = 0
+bool hideControlPoint = false;
+bool hideControlCage = false;
+bool hideControlPath = false;
+
 //*************************************************************************************
 //
 // Helper Functions
@@ -137,6 +144,8 @@ void renderBezierCurve( glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, 
 		for (float i = 0; i <= 1.0f+step; i+=step) {
 			glm::vec3 point = evaluateBezierCurve( p0, p1, p2, p3, i );
 			glVertex3f(point.x, point.y, point.z);
+			
+			if (i != 0) controlPath.push_back(point);	// the point in the curve
 		}
 	}; glEnd();
 }
@@ -220,6 +229,15 @@ static void keyboard_callback( GLFWwindow *window, int key, int scancode, int ac
 			case GLFW_KEY_D:
 				carTheta -= M_PI/10;
 				recomputeOrientation();
+				break;
+			case GLFW_KEY_1:
+				hideControlCage = !hideControlCage;
+				break;
+			case GLFW_KEY_2:
+				hideControlPoint = !hideControlPoint;
+				break;
+			case GLFW_KEY_3:
+				hideControlPath = !hideControlPath;
 				break;
 		}
 	}
@@ -628,7 +646,7 @@ void drawArms() {
 
 // draw the mascot
 void drawMascot() {
-	glm::mat4 transCube = glm::translate( glm::mat4(), glm::vec3(1, 5, 1));
+	glm::mat4 transCube = glm::translate( glm::mat4(), glm::vec3(0, 0, 0));
 	glMultMatrixf( &transCube[0][0] ); {
 		// draw body
 		glColor3f( 0.2324, 0.4196, 0.5098 );
@@ -645,28 +663,37 @@ void drawMascot() {
 // draw curve
 void drawCurve() {
 	// TODO #03: Draw our control points
-	for (std::size_t i = 0; i < controlPoints.size(); ++i) {
-		glm::mat4 transCube = glm::translate( glm::mat4(), controlPoints.at(i));
-		glMultMatrixf( &transCube[0][0] ); {
-			glColor3f( 0, 1, 0);
-			CSCI441::drawSolidSphere( 0.5, 4, 5 );
-		}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
-	}
-	// TODO #04: Connect our control points
-	glColor3f(1.000, 1.000, 0.000);
-	glLineWidth(6.0);
-	glBegin( GL_LINE_STRIP ); {
-		for (int i = 0; i < numSegments; ++i) {
-			glVertex3f(controlPoints.at(i).x, controlPoints.at(i).y, controlPoints.at(i).z);
+	if (!hideControlPoint) {
+		for (std::size_t i = 0; i < controlPoints.size(); ++i) {
+			glm::mat4 transCube = glm::translate( glm::mat4(), controlPoints.at(i));
+			glMultMatrixf( &transCube[0][0] ); {
+				glColor3f( 0, 1, 0);
+				CSCI441::drawSolidSphere( 0.5, 4, 5 );
+			}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
 		}
-	}; glEnd();
+	}
+	
+	// TODO #04: Connect our control points
+	if (!hideControlCage) {
+		glColor3f(1.000, 1.000, 0.000);
+		glLineWidth(6.0);
+		glBegin( GL_LINE_STRIP ); {
+			for (int i = 0; i < numSegments; ++i) {
+				glVertex3f(controlPoints.at(i).x, controlPoints.at(i).y, controlPoints.at(i).z);
+			}
+		}; glEnd();
+	}
+	
 	
 	
 	// TODO #05: Draw the Bezier Curve!
-	for (int i = 0; i < numSegments-1; i+=3) {
+	if (!hideControlPath) {
+		for (int i = 0; i < numSegments-1; i+=3) {
 			renderBezierCurve( controlPoints.at(i), controlPoints.at(i+1), controlPoints.at(i+2), 
 							controlPoints.at(i+3), 100 );
+		}
 	}
+	
 }
 
 // These functions will draw the car
@@ -683,8 +710,18 @@ void drawCar() {
 				// The curve
 				drawCurve();
 				
-				// the mascot							
-				drawMascot();
+				// the mascot			
+				glm::mat4 transMas = glm::translate( glm::mat4(), controlPoint);
+				glMultMatrixf( &transMas[0][0] ); {
+					glm::mat4 rotTri = glm::rotate( glm::mat4(), (float)M_PI*0.5f, glm::vec3( 0.0f, 1.0f, 0.0f ) );
+					glMultMatrixf( &rotTri[0][0] ); {
+						glm::mat4 scaleTri = glm::scale( glm::mat4(), glm::vec3( 0.5f, 0.5f, 0.5f ) );
+						glMultMatrixf( &scaleTri[0][0] ); {
+							drawMascot();
+						}; glMultMatrixf( &(glm::inverse( scaleTri ))[0][0] );
+					}; glMultMatrixf( &(glm::inverse( rotTri ))[0][0] );
+				}; glMultMatrixf( &(glm::inverse( transMas ))[0][0] );
+				
 			}; glMultMatrixf( &(glm::inverse( rotTri ))[0][0] );
 		}; glMultMatrixf( &(glm::inverse( scaleTri ))[0][0] );
 	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
@@ -725,7 +762,12 @@ void generateEnvironmentDL() {
 void renderScene(void)  {
     // TODO #2: REMOVE TEAPOT & CREATE A CITY SCENE ON A GRID...but call it's display list!
 	glCallList( environmentDL );
+	
+	if (path == (int)controlPath.size()) path = 0;
+	controlPoint = controlPath.at(path);
 	drawCar();
+	
+	++path;
 	
 }
 
@@ -855,6 +897,9 @@ int main( int argc, char *argv[] ) {
 	}
 	else {
 		loadControlPoints(argv[1]);
+		// load in the control path
+		controlPath.push_back(controlPoints.at(0));
+		//std::cout << controlPoints.at(0).y << endl;
 	}
 	
 	// GLFW sets up our OpenGL context so must be done first
