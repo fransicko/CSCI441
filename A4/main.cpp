@@ -512,6 +512,32 @@ void drawCube() {
 	
 }
 
+void drawCurve() {
+	// TODO #03: Draw our control points
+	for (std::size_t i = 0; i < controlPoints.size(); ++i) {
+		glm::mat4 transCube = glm::translate( glm::mat4(), controlPoints.at(i));
+		glMultMatrixf( &transCube[0][0] ); {
+			glColor3f( 0, 1, 0);
+			CSCI441::drawSolidSphere( 0.5, 4, 5 );
+		}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
+	}
+	// TODO #04: Connect our control points
+	glColor3f(1.000, 1.000, 0.000);
+	glLineWidth(6.0);
+	glBegin( GL_LINE_STRIP ); {
+		for (int i = 0; i < numSegments; ++i) {
+			glVertex3f(controlPoints.at(i).x, controlPoints.at(i).y, controlPoints.at(i).z);
+		}
+	}; glEnd();
+	
+	
+	// TODO #05: Draw the Bezier Curve!
+	for (int i = 0; i < numSegments-1; i+=3) {
+			renderBezierCurve( controlPoints.at(i), controlPoints.at(i+1), controlPoints.at(i+2), 
+							controlPoints.at(i+3), 100 );
+	}
+}
+
 // These functions will draw the car
 void drawCar() {
 	glm::mat4 transCube = glm::translate( glm::mat4(), carPos );
@@ -522,6 +548,9 @@ void drawCar() {
 			glMultMatrixf( &rotTri[0][0] ); {
 				// and then scale it 10X in x and 10X in y
 				drawCube();
+				
+				// The curve
+				drawCurve();
 			}; glMultMatrixf( &(glm::inverse( rotTri ))[0][0] );
 		}; glMultMatrixf( &(glm::inverse( scaleTri ))[0][0] );
 	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
@@ -564,31 +593,6 @@ void renderScene(void)  {
 	glCallList( environmentDL );
 	drawCar();
 	
-	// Need to change the location of the car
-	
-	// TODO #03: Draw our control points
-	for (std::size_t i = 0; i < controlPoints.size(); ++i) {
-		glm::mat4 transCube = glm::translate( glm::mat4(), controlPoints.at(i));
-		glMultMatrixf( &transCube[0][0] ); {
-			glColor3f( 0, 1, 0);
-			CSCI441::drawSolidSphere( 0.5, 4, 5 );
-		}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
-	}
-	// TODO #04: Connect our control points
-	glColor3f(1.000, 1.000, 0.000);
-	glLineWidth(6.0);
-	glBegin( GL_LINE_STRIP ); {
-		for (int i = 0; i < numSegments; ++i) {
-			glVertex3f(controlPoints.at(i).x, controlPoints.at(i).y, controlPoints.at(i).z);
-		}
-	}; glEnd();
-	
-	
-	// TODO #05: Draw the Bezier Curve!
-	for (int i = 0; i < numSegments-1; i+=3) {
-			renderBezierCurve( controlPoints.at(i), controlPoints.at(i+1), controlPoints.at(i+2), 
-							controlPoints.at(i+3), 100 );
-	}
 }
 
 //*************************************************************************************
