@@ -512,6 +512,41 @@ void drawCube() {
 	
 }
 
+// draw all the different eyeballs
+void drawFace() {
+	// draw the center eyeballs
+	glm::mat4 transCube = glm::translate( glm::mat4(), glm::vec3(-1.5, 0, 0));
+	glMultMatrixf( &transCube[0][0] ); {
+		// draw body
+		glColor3f( 0.4941, 0.9843, 1 );
+		CSCI441::drawSolidSphere( 0.75, 8, 8 );
+	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
+	
+	// Now we need the 6 eyes surounding the big eyeball
+	
+	// left and right
+	transCube = glm::translate( glm::mat4(), glm::vec3(-1.25, 0, -0.25)); // more z
+	glMultMatrixf( &transCube[0][0] ); {
+		// draw body
+		glColor3f( 0.4941, 0.9843, 1 );
+		CSCI441::drawSolidSphere( 0.75, 8, 8 );
+	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
+}
+
+// draw the mascot
+void drawMascot() {
+	glm::mat4 transCube = glm::translate( glm::mat4(), glm::vec3(1, 2, 1));
+	glMultMatrixf( &transCube[0][0] ); {
+		// draw body
+		glColor3f( 0.2324, 0.4196, 0.5098 );
+		CSCI441::drawSolidSphere( 2, 8, 8 );
+		
+		// draw facet
+		drawFace();
+	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
+}
+
+// draw curve
 void drawCurve() {
 	// TODO #03: Draw our control points
 	for (std::size_t i = 0; i < controlPoints.size(); ++i) {
@@ -551,6 +586,9 @@ void drawCar() {
 				
 				// The curve
 				drawCurve();
+				
+				// the mascot							
+				drawMascot();
 			}; glMultMatrixf( &(glm::inverse( rotTri ))[0][0] );
 		}; glMultMatrixf( &(glm::inverse( scaleTri ))[0][0] );
 	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
