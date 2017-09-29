@@ -423,7 +423,7 @@ void setupScene() {
 int main( int argc, char *argv[] ) {
 	// TODO #01: make sure a control point CSV file was passed in.  Then read the points from file
 	string file = argv[1];
-	if (argc != 2 || file.substr(file.length()-4, 3) != "csv") {
+	if (argc != 2 || file.substr(file.length()-3, 3) != "csv") {
 		std::cerr << "No csv was specified." << endl;
 		return -1;
 	}
