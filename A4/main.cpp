@@ -524,18 +524,111 @@ void drawFace() {
 	
 	// Now we need the 6 eyes surounding the big eyeball
 	
-	// left and right
-	transCube = glm::translate( glm::mat4(), glm::vec3(-1.25, 0, -0.25)); // more z
+	// Middle left and right
+	transCube = glm::translate( glm::mat4(), glm::vec3(-1.25, 0, -1.1)); // more z
 	glMultMatrixf( &transCube[0][0] ); {
-		// draw body
+		// draw eye
 		glColor3f( 0.4941, 0.9843, 1 );
-		CSCI441::drawSolidSphere( 0.75, 8, 8 );
+		CSCI441::drawSolidSphere( 0.40, 8, 8 );
+	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
+	transCube = glm::translate( glm::mat4(), glm::vec3(-1.25, 0, 1.1)); // more z
+	glMultMatrixf( &transCube[0][0] ); {
+		// draw eye
+		glColor3f( 0.4941, 0.9843, 1 );
+		CSCI441::drawSolidSphere( 0.40, 8, 8 );
+	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
+	
+	// Top left and right
+	transCube = glm::translate( glm::mat4(), glm::vec3(-1.1, 0.75, -1.1)); // more z
+	glMultMatrixf( &transCube[0][0] ); {
+		// draw eye
+		glColor3f( 0.4941, 0.9843, 1 );
+		CSCI441::drawSolidSphere( 0.40, 8, 8 );
+	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
+	transCube = glm::translate( glm::mat4(), glm::vec3(-1.1q, 0.75, 1.1)); // more z
+	glMultMatrixf( &transCube[0][0] ); {
+		// draw eye
+		glColor3f( 0.4941, 0.9843, 1 );
+		CSCI441::drawSolidSphere( 0.40, 8, 8 );
+	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
+	
+	// Bottom left and Right
+	// Top left and right
+	transCube = glm::translate( glm::mat4(), glm::vec3(-1.1, -0.75, -1.1)); // more z
+	glMultMatrixf( &transCube[0][0] ); {
+		// draw eye
+		glColor3f( 0.4941, 0.9843, 1 );
+		CSCI441::drawSolidSphere( 0.40, 8, 8 );
+	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
+	transCube = glm::translate( glm::mat4(), glm::vec3(-1.1q, -0.75, 1.1)); // more z
+	glMultMatrixf( &transCube[0][0] ); {
+		// draw eye
+		glColor3f( 0.4941, 0.9843, 1 );
+		CSCI441::drawSolidSphere( 0.40, 8, 8 );
+	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
+	
+}
+
+// draw arms
+void drawArms() {
+	// draw front tentacles left and right tantecle
+	glm::mat4 transCube = glm::translate( glm::mat4(), glm::vec3(-0.6, -0.5, 0.8) );
+	glMultMatrixf( &transCube[0][0] ); {
+		glm::mat4 scaleTri = glm::scale( glm::mat4(), glm::vec3( 0.5f, 0.5f, 0.5f ) );
+		glMultMatrixf( &scaleTri[0][0] ); {
+			glm::mat4 rotTri = glm::rotate( glm::mat4(), (float)M_PI, glm::vec3( 1.0f, 0.0f, 0.0f ) );
+			glMultMatrixf( &rotTri[0][0] ); {
+				// and then scale it 10X in x and 10X in y
+				glColor3f( 57.0/255, 86.0/255, 94.0/255 );
+				CSCI441::drawSolidCone( 1.5, 5, 2, 6 ) ;
+			}; glMultMatrixf( &(glm::inverse( rotTri ))[0][0] );
+		}; glMultMatrixf( &(glm::inverse( scaleTri ))[0][0] );
+	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
+	
+	transCube = glm::translate( glm::mat4(), glm::vec3(-0.6, -0.5, -0.8) );
+	glMultMatrixf( &transCube[0][0] ); {
+		glm::mat4 scaleTri = glm::scale( glm::mat4(), glm::vec3( 0.5f, 0.5f, 0.5f ) );
+		glMultMatrixf( &scaleTri[0][0] ); {
+			glm::mat4 rotTri = glm::rotate( glm::mat4(), (float)M_PI, glm::vec3( 1.0f, 0.0f, 0.0f ) );
+			glMultMatrixf( &rotTri[0][0] ); {
+				// and then scale it 10X in x and 10X in y
+				glColor3f( 57.0/255, 86.0/255, 94.0/255 );
+				CSCI441::drawSolidCone( 1.5, 5, 2, 6 ) ;
+			}; glMultMatrixf( &(glm::inverse( rotTri ))[0][0] );
+		}; glMultMatrixf( &(glm::inverse( scaleTri ))[0][0] );
+	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
+	
+	// back tentacles
+	transCube = glm::translate( glm::mat4(), glm::vec3(0.7, -0.0, 0.9) );
+	glMultMatrixf( &transCube[0][0] ); {
+		glm::mat4 scaleTri = glm::scale( glm::mat4(), glm::vec3( 0.5f, 0.5f, 0.5f ) );
+		glMultMatrixf( &scaleTri[0][0] ); {
+			glm::mat4 rotTri = glm::rotate( glm::mat4(), (float)M_PI, glm::vec3( 1.0f, 0.0f, 0.0f ) );
+			glMultMatrixf( &rotTri[0][0] ); {
+				// and then scale it 10X in x and 10X in y
+				glColor3f( 57.0/255, 86.0/255, 94.0/255 );
+				CSCI441::drawSolidCone( 1.5, 5, 2, 6 ) ;
+			}; glMultMatrixf( &(glm::inverse( rotTri ))[0][0] );
+		}; glMultMatrixf( &(glm::inverse( scaleTri ))[0][0] );
+	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
+	
+	transCube = glm::translate( glm::mat4(), glm::vec3(0.7, -0.0, -0.9) );
+	glMultMatrixf( &transCube[0][0] ); {
+		glm::mat4 scaleTri = glm::scale( glm::mat4(), glm::vec3( 0.5f, 0.5f, 0.5f ) );
+		glMultMatrixf( &scaleTri[0][0] ); {
+			glm::mat4 rotTri = glm::rotate( glm::mat4(), (float)M_PI, glm::vec3( 1.0f, 0.0f, 0.0f ) );
+			glMultMatrixf( &rotTri[0][0] ); {
+				// and then scale it 10X in x and 10X in y
+				glColor3f( 57.0/255, 86.0/255, 94.0/255 );
+				CSCI441::drawSolidCone( 1.5, 5, 2, 6 ) ;
+			}; glMultMatrixf( &(glm::inverse( rotTri ))[0][0] );
+		}; glMultMatrixf( &(glm::inverse( scaleTri ))[0][0] );
 	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
 }
 
 // draw the mascot
 void drawMascot() {
-	glm::mat4 transCube = glm::translate( glm::mat4(), glm::vec3(1, 2, 1));
+	glm::mat4 transCube = glm::translate( glm::mat4(), glm::vec3(1, 5, 1));
 	glMultMatrixf( &transCube[0][0] ); {
 		// draw body
 		glColor3f( 0.2324, 0.4196, 0.5098 );
@@ -543,6 +636,9 @@ void drawMascot() {
 		
 		// draw facet
 		drawFace();
+		
+		// draw arms
+		drawArms();
 	}; glMultMatrixf( &(glm::inverse( transCube ))[0][0] );
 }
 
