@@ -100,7 +100,7 @@ bool registerOpenGLTexture(unsigned char *textureData,
 		
 	GLsizei n = 1;
 	glEnable(GL_TEXTURE_2D);
-	glGenTextures(n, &textureHandle);
+	glGenTextures(n,&textureHandle);
 	glBindTexture(GL_TEXTURE_2D, textureHandle);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	// 5
@@ -110,6 +110,7 @@ bool registerOpenGLTexture(unsigned char *textureData,
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // 6
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
+	cout << "before the teximage2d." << endl;
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_INT, textureData);
 	
     return true;
@@ -295,17 +296,10 @@ void setupLights() {
 //
 void setupTextures() {
   // TODO #1: Read in the brick PPM file
-	ifstream ppm("textures/brick.ppm");
-	std::string format = "";
-	std::string line = "";
+	std::string format;
 	int width;
 	int height;
-
-	
-	ppm >> format; // get the format
-	ppm >> width >> height;
-	
-	unsigned char* imageData = new unsigned char[width*height*3];
+	unsigned char* imageData;
 	
 	CSCI441::loadPPM("textures/brick.ppm", width, height, imageData);
 	// TODO #2a: call the registerOpenGLTexture() function unsigned char *textureData,unsigned int texWidth, unsigned int texHeight,GLuint &textureHandle)
