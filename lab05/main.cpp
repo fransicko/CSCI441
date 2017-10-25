@@ -25,6 +25,7 @@
 #include <CSCI441/objects.hpp> 				// for our 3D objects
 #include <CSCI441/OpenGLUtils.hpp>		// for OpenGL helpers
 #include <CSCI441/TextureUtils.hpp>		// for Texture helpers
+#include <SOIL/SOIL.h>		// for SOIL image stuff
 
 // include GLM libraries and matrix functions
 #include <glm/glm.hpp>
@@ -110,9 +111,8 @@ bool registerOpenGLTexture(unsigned char *textureData,
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // 6
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	cout << "before the teximage2d." << endl;
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_INT, textureData);
-	
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)textureData);
+
     return true;
 }
 
@@ -307,7 +307,20 @@ void setupTextures() {
 
 
   // TODO #5: Read in non-PPM
-  // TODO #6: Register non-PPM
+	minesTexHandle = SOIL_load_OGL_texture(
+		"textures/mines.png",
+		SOIL_LOAD_AUTO,
+		SOIL_CREATE_NEW_ID,
+		SOIL_FLAG_MIPMAPS
+		| SOIL_FLAG_INVERT_Y
+		| SOIL_FLAG_COMPRESS_TO_DXT
+	);
+	// TODO #6: Register non-PPM
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	// 6
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // 6
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
 
 //*************************************************************************************
@@ -411,6 +424,8 @@ void renderScene(void)  {
   CSCI441::setMaterial( emeraldMaterial );
 
   // TODO #3a
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, minesTexHandle);
 
   switch( objectIndex ) {
     case 0: CSCI441::drawSolidTeapot( 2.0 );                            break;
@@ -423,10 +438,34 @@ void renderScene(void)  {
     case 7: CSCI441::drawSolidPartialDisk( 1.0, 2.0, 16, 16, 30, 120 ); break;
     case 8:
       // TODO 4a/b/c
+	    glBegin( GL_QUADS ); {
+			// +X axis in bright red
+			glColor3f(1,0,0);
+			
+			glNormal3f(0, 0, 1);
+			glTexCoord2f(0, 0);
+			glVertex3f(0,0,0); 
+			
+			glNormal3f(0, 0, 1);
+			glTexCoord2f(2, 0);
+			glVertex3f(5,0,0);
+			
+			glNormal3f(0, 0, 1);
+			glTexCoord2f(2, 2);
+			glVertex3f(5,5,0);
+			
+			glNormal3f(0, 0, 1);
+			glTexCoord2f(0, 2);
+			glVertex3f(0,5,0);
+			
+			//glVertex3f(0,0,0);
+			//glVertex3f(5,5,0);
+		}; glEnd();
       break;
   }
 
   // TODO #3b
+  glDisable(GL_TEXTURE_2D);
 }
 
 ///*************************************************************************************

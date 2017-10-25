@@ -1,19 +1,19 @@
 CSCI441, Computer Graphics, Fall 2017
-Dr. Jeffrey Paone
+Michael Villafuerte
 
-Code Example: Lab05
+Q1. The teapot looks like it was made with bricks.
 
-	This program contains an arc ball camera revolving around a teapot.
+Q2. All the other images where textured as well.
 
-Usage: 
-    Left click and dragging the mouse moves the camera around.
+Q3. It looks a bit dark but if i switch between some objects it gets light added to it.
 
-    Ctrl + Left click will zoom the camera in/out.
+Q4. The teapot is mines up.
 
-    The user can also press the 'q' or ESC key to quit the program.
+Q5. The image is on my quad and it is oriantated correctly.
 
-Compilation Instructions:
-    Simply navigate to the directory and type 'make.' main.cpp needs
-    to be linked with the OpenGL / GLFW / glm / CSCI441 / SOIL libraries.  
+Q6. There are now four mines log appearing on the block
 
-Notes:
+Q7. 8
+Q8. The right up was good
+Q9. 3hrs
+Q10. No
