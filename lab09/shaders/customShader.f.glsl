@@ -7,6 +7,7 @@
 #version 330 core
 
 // TODO #F3
+in vec3 theColor;
 
 // TODO #D
 out vec4 fragColorOut;
@@ -21,4 +22,5 @@ void main() {
 	fragColorOut = vec4(1,1,1,1);
 	
     // TODO #F4
+	fragColorOut = vec4(theColor, 1.0);
 }
