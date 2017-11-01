@@ -306,7 +306,6 @@ void setupShaders( const char *vertexShaderFilename, const char *fragmentShaderF
 	
   // TODO #10A
   time_uniform_location = glGetUniformLocation(shaderProgramHandle, "time");
-  glUniform1f(time_uniform_location, 1.0);
 	// TODO #8B
 	vpos_attrib_location = glGetAttribLocation(shaderProgramHandle, "vPosition");
 }
