@@ -21,6 +21,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <SOIL/SOIL.h>		// for image loading
 #include <stdio.h>				// for printf functionality
 #include <stdlib.h>				// for exit functionality
 
@@ -53,7 +54,11 @@ CSCI441::ModelLoader* model = NULL;
 
 GLuint shaderProgramHandle = 0;
 GLint mvp_uniform_location = -1, time_uniform_location = -1;
-GLint vpos_attrib_location = -1;
+GLint vpos_attrib_location = -1, text_coor_location = -1;
+
+GLuint platformTextureHandle;
+GLuint vaods;
+GLuint vbod;
 
 //******************************************************************************
 //
@@ -70,6 +75,32 @@ void convertSphericalToCartesian() {
 	eyePoint.x = cameraAngles.z * sinf( cameraAngles.x ) * sinf( cameraAngles.y );
 	eyePoint.y = cameraAngles.z * -cosf( cameraAngles.y );
 	eyePoint.z = cameraAngles.z * -cosf( cameraAngles.x ) * sinf( cameraAngles.y );
+}
+
+
+// loadAndRegisterTexture() ////////////////////////////////////////////////////
+//
+// Load and register a texture with OpenGL
+//
+////////////////////////////////////////////////////////////////////////////////
+GLuint loadAndRegisterTexture( const char *filename ) {
+	GLuint texHandle = SOIL_load_OGL_texture( filename,
+																					 SOIL_LOAD_AUTO,
+																					 SOIL_CREATE_NEW_ID,
+																					 SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT );
+
+	if( texHandle == 0 ) {
+			printf( "[ERROR]: Could not load texture \"%s\"\n[SOIL]: %s\n", filename, SOIL_last_result() );
+	} else {
+			printf( "[INFO]: Successfully loaded texture \"%s\"\n[SOIL]: %s\n", filename, SOIL_last_result() );
+			glBindTexture(   GL_TEXTURE_2D,  platformTextureHandle );
+			glTexParameteri( GL_TEXTURE_2D,  GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+			glTexParameteri( GL_TEXTURE_2D,  GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+			glTexParameteri( GL_TEXTURE_2D,  GL_TEXTURE_WRAP_S,     GL_REPEAT );
+			glTexParameteri( GL_TEXTURE_2D,  GL_TEXTURE_WRAP_T,     GL_REPEAT );
+	}
+
+	return texHandle;
 }
 
 //******************************************************************************
@@ -203,6 +234,9 @@ static void scroll_callback(GLFWwindow* window, double xOffset, double yOffset )
 //
 // Setup Functions
 
+
+
+
 // setupGLFW() /////////////////////////////////////////////////////////////////
 //
 //		Used to setup everything GLFW related.  This includes the OpenGL context
@@ -308,7 +342,18 @@ void setupShaders( const char *vertexShaderFilename, const char *fragmentShaderF
   time_uniform_location = glGetUniformLocation(shaderProgramHandle, "time");
 	// TODO #8B
 	vpos_attrib_location = glGetAttribLocation(shaderProgramHandle, "vPosition");
+	text_coor_location = glGetAttribLocation(shaderProgramHandle, "texCoord");
 }
+
+// setupTextures() /////////////////////////////////////////////////////////////
+//
+//      Load and register all the tetures for our program
+//
+////////////////////////////////////////////////////////////////////////////////
+void setupTextures() {
+	platformTextureHandle = loadAndRegisterTexture( "textures/skybox/dark-ground.jpg" );
+}
+
 
 // setupBuffers() //////////////////////////////////////////////////////////////
 //
@@ -318,6 +363,46 @@ void setupShaders( const char *vertexShaderFilename, const char *fragmentShaderF
 void setupBuffers() {
   model = new CSCI441::ModelLoader();
   model->loadModelFile( "models/suzanne.obj" );
+
+	// TODO #01 - create our struct here
+	struct VertexTextured {
+		float x, y, z, s, t;
+	};
+
+	// TODO #02: create our platform vertex array
+	VertexTextured vertexArr[4] = {
+		{-10, -1, -10, 0, 0}, 
+		{10, -1, -10, 1, 0},
+		{10, -1, 10, 1, 1},
+		{-10, -1, 10, 0, 1}
+	};
+
+  // TODO #03: create the index array
+  unsigned short indexArray[6] = {0, 1, 2, 2, 3, 0};
+
+	// TODO #04B: generate and bind the VAO
+	glGenVertexArrays(1, &vaods);
+	glBindVertexArray(vaods);
+	
+	// TODO #05A: generate and bind the array VBO
+	glGenBuffers(1, &vbod);
+	glBindBuffer(GL_ARRAY_BUFFER, vbod);
+
+	// TODO #05B: send the vertex data to the GPU
+	glBufferData( GL_ARRAY_BUFFER, sizeof(vertexArr), vertexArr, GL_STATIC_DRAW );
+
+	// TODO #06A: state where the vertex position is located within our array data
+	glEnableVertexAttribArray( vpos_attrib_location );
+	glVertexAttribPointer( vpos_attrib_location, 3, GL_FLOAT, GL_FALSE, sizeof( VertexTextured ), (void*)0 );
+
+	// TODO #06B: state where the texture coordinate is located within our array data
+	glEnableVertexAttribArray( text_coor_location );
+	glVertexAttribPointer( text_coor_location, 2, GL_FLOAT, GL_FALSE, sizeof( VertexTextured ), (void*)(sizeof(float) * 3));
+
+	// TODO #07: generate and bind the element array VBO.  send data to the GPU
+	glGenBuffers(1, &vbod);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbod);
+	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof(indexArray), indexArray, GL_STATIC_DRAW );
 }
 
 //******************************************************************************
@@ -347,6 +432,8 @@ void renderScene( glm::mat4 viewMtx, glm::mat4 projMtx ) {
   glUniform1f(time_uniform_location, glfwGetTime());
 
   // draw all the cool stuff!
+  model->draw( vpos_attrib_location );
+  /*
   switch( objectIndex ) {
     case 0: CSCI441::drawSolidTeapot( 2.0 );                            break;
     case 1: CSCI441::drawSolidCube( 4.0 );                              break;
@@ -356,6 +443,13 @@ void renderScene( glm::mat4 viewMtx, glm::mat4 projMtx ) {
     case 5: CSCI441::drawSolidCylinder( 2.0, 2.0, 4.0, 16, 16 );        break;
     case 6: model->draw( vpos_attrib_location );                        break;
   }
+  */
+  
+  // TODO #08: draw the platform!
+	glEnable(GL_TEXTURE);
+	glBindTexture(   GL_TEXTURE_2D,  platformTextureHandle );
+	glBindVertexArray(vaods);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)0);
 }
 
 ///*****************************************************************************
@@ -385,7 +479,8 @@ int main( int argc, char *argv[] ) {
 
 	setupShaders( argv[1], argv[2] ); // load our shader program into memory
 	setupBuffers();										// load all our VAOs and VBOs into memory
-
+	setupTextures();
+	
   // needed to connect our 3D Object Library to our shader
 	// LOOKHERE #3
   CSCI441::setVertexAttributeLocations( vpos_attrib_location );

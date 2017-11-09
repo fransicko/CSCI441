@@ -6,11 +6,14 @@
 
 #version 330 core
 
+in vec2 texCoord;
+
 // TODO #B
 in vec3 vPosition;
 
 // TODO #F1
 out vec3 theColor;
+out vec2 texCoord2;
 
 // TODO #A
 uniform mat4 mvpMatrix;
@@ -23,15 +26,9 @@ void main() {
     /********* Vertex Calculations  **********/
     /*****************************************/
     
-    // TODO #G2
-	vec3 newVertex = vPosition;
-	if (vPosition.x > 0 && vPosition.y > 0 && vPosition.z > 0) {
-		newVertex = newVertex + 1.2*((sin(time) + 1) / 2) - 0.2;
-	}	
-    
     // TODO #C
-	gl_Position = mvpMatrix * vec4(newVertex, 1);
+	gl_Position = mvpMatrix * vec4(vPosition, 1);
     
     // TODO #F2
-	theColor = vPosition;
+	texCoord2 = texCoord;
 }

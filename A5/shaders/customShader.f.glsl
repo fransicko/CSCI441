@@ -6,6 +6,9 @@
 
 #version 330 core
 
+uniform sampler2D textureMap;	// uniform set to bound texture
+in vec2 texCoord2;
+
 // TODO #F3
 in vec3 theColor;
 
@@ -17,10 +20,12 @@ void main() {
     /*****************************************/
     /******* Final Color Calculations ********/
     /*****************************************/
+	
+	vec4 texel = texture( textureMap, texCoord2 );
     
     // TODO #E
-	fragColorOut = vec4(1,1,1,1);
+	fragColorOut = texel;//vec4(texCoord2,1,1);
 	
     // TODO #F4
-	fragColorOut = vec4(theColor, 1.0);
+	//fragColorOut = vec4(theColor, 1.0);
 }
