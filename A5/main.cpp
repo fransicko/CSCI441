@@ -56,6 +56,24 @@ GLuint shaderProgramHandle = 0;
 GLint mvp_uniform_location = -1, time_uniform_location = -1;
 GLint vpos_attrib_location = -1, text_coor_location = -1;
 
+// Lighting uniforms
+GLint lightDiff = -1;
+GLint lightAmb = -1;
+GLint lightSpec = -1;
+GLint matDiff = -1;
+GLint matAmb = -1;
+GLint matSpec = -1;
+GLint lightPos = -1;
+GLint camPos = -1;
+GLint shine = -1;
+GLint normalHandle = -1;
+
+
+
+GLuint objectProgramHandle = 0;
+GLint obj_mvp_uniform_location = -1, obj_time_uniform_location = -1;
+GLint obj_vpos_attrib_location = -1, obj_text_coor_location = -1;
+
 GLuint platformTextureHandle, frontTextureHandle, backTextureHandle, ceilTextureHandle, leftTextureHandle, rightTextureHandle;
 GLuint vaods;
 GLuint vaodCeil;
@@ -351,6 +369,32 @@ void setupShaders( const char *vertexShaderFilename, const char *fragmentShaderF
 	text_coor_location = glGetAttribLocation(shaderProgramHandle, "texCoord");
 }
 
+void setupObjShaders( const char *vertexShaderFilename, const char *fragmentShaderFilename ) {
+	objectProgramHandle = createShaderProgram(vertexShaderFilename, fragmentShaderFilename);
+	 
+	 // NOTE: Should really check to make sure that the stuff is greater then 0
+	
+	// TODO #8A
+	obj_mvp_uniform_location = glGetUniformLocation(objectProgramHandle, "mvpMatrix");
+	
+	// TODO #10A
+	obj_time_uniform_location = glGetUniformLocation(objectProgramHandle, "time");
+	// TODO #8B
+	obj_vpos_attrib_location = glGetAttribLocation(objectProgramHandle, "vPosition");
+	obj_text_coor_location = glGetAttribLocation(objectProgramHandle, "texCoord");
+
+	lightDiff = glGetUniformLocation(objectProgramHandle, "lightDiff");
+	lightSpec = glGetUniformLocation(objectProgramHandle, "lightSpec");
+	lightAmb = glGetUniformLocation(objectProgramHandle, "lightAmb");
+	matDiff = glGetUniformLocation(objectProgramHandle, "matDiff");
+	matSpec = glGetUniformLocation(objectProgramHandle, "matSpec");
+	matAmb = glGetUniformLocation(objectProgramHandle, "matAmb");
+	lightPos = glGetUniformLocation(objectProgramHandle, "lightPos");
+	camPos = glGetUniformLocation(objectProgramHandle, "camPos");
+	shine = glGetUniformLocation(objectProgramHandle, "shine");
+	normalHandle = glGetAttribLocation(objectProgramHandle, "normalHandle");
+}
+
 // setupTextures() /////////////////////////////////////////////////////////////
 //
 //      Load and register all the tetures for our program
@@ -366,14 +410,17 @@ void setupTextures() {
 }
 
 
+void setupObject(const char *objectFilename) {
+	model = new CSCI441::ModelLoader();
+	model->loadModelFile( objectFilename );
+}
 // setupBuffers() //////////////////////////////////////////////////////////////
 //
 //      Create our VAOs & VBOs. Send vertex data to the GPU for future rendering
 //
 ////////////////////////////////////////////////////////////////////////////////
 void setupBuffers() {
-  model = new CSCI441::ModelLoader();
-  model->loadModelFile( "models/suzanne.obj" );
+  
 
 	// TODO #01 - create our struct here
 	struct VertexTextured {
@@ -647,6 +694,7 @@ void renderScene( glm::mat4 viewMtx, glm::mat4 projMtx ) {
   glm::mat4 modelMtx;
 
   // use our shader program
+  // Draw the skybox
 	// TODO #9A
 	glUseProgram(shaderProgramHandle);
 
@@ -660,7 +708,7 @@ void renderScene( glm::mat4 viewMtx, glm::mat4 projMtx ) {
   glUniform1f(time_uniform_location, glfwGetTime());
 
   // draw all the cool stuff!
-  model->draw( vpos_attrib_location );
+  
   /*
   switch( objectIndex ) {
     case 0: CSCI441::drawSolidTeapot( 2.0 );                            break;
@@ -704,6 +752,39 @@ void renderScene( glm::mat4 viewMtx, glm::mat4 projMtx ) {
 	glBindTexture(   GL_TEXTURE_2D,  leftTextureHandle );
 	glBindVertexArray(vaodLeft);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)0);
+	
+	
+	// The object shading
+	  // Draw the suzen
+  glUseProgram(objectProgramHandle);
+
+  // precompute our MVP CPU side so it only needs to be computed once
+  glm::mat4 obj_mvpMtx = projMtx * viewMtx * modelMtx;
+  // send MVP to GPU
+	// TODO #9B
+	glUniformMatrix4fv(obj_mvp_uniform_location, 1, GL_FALSE, &obj_mvpMtx[0][0]);
+	
+	//glUniformMatrix4fv(obj_mvp_uniform_location, 1, GL_FALSE, &mvpMtx[0][0]);
+  
+	glUniform3f(matAmb, 0.1f, 0.18725f, 0.1745f);
+	glUniform3f(matDiff, 0.396f, 0.74151f, .69102f);
+	glUniform3f(matSpec, 0.297254f, 0.30829f, 0.306678f);
+	glUniform1f(shine, 0.1f);
+	
+	glUniform3f(lightAmb, 1.0f, 1.0f, 1.0f);
+	glUniform3f(lightDiff, 1.0f, 1.0f, 1.0f);
+	glUniform3f(lightSpec, 1.0f, 1.0f, 1.0f);
+	
+	glUniform3f(lightPos, 10.0f, 10.0f, 10.0f);
+	glUniform3f(camPos, eyePoint.x, eyePoint.y, eyePoint.z);
+	
+  //model->draw( obj_vpos_attrib_location, normalHandle );
+  
+  
+  model->draw(obj_vpos_attrib_location, normalHandle, obj_text_coor_location, matDiff, matSpec, shine, matAmb);
+	
+	
+	
 }
 
 ///*****************************************************************************
@@ -717,13 +798,13 @@ void renderScene( glm::mat4 viewMtx, glm::mat4 projMtx ) {
 ////////////////////////////////////////////////////////////////////////////////
 int main( int argc, char *argv[] ) {
   // ensure proper number of arguments provided at runtime
-  /*
-	if( argc != 3 ) {
+  
+	if( argc != 2 ) {
     // we need a vertex and fragment shader
-		fprintf( stderr, "Usage: ./a5 <shader.v.glsl> <shader.f.glsl>\n" );
+		fprintf( stderr, "Usage: ./a5 <file.obj>\n" );
 		exit(EXIT_FAILURE);
 	}
-	*/
+	
   // GLFW sets up our OpenGL context so must be done first
 	GLFWwindow *window = setupGLFW();	// initialize all of the GLFW specific information releated to OpenGL and our window
 	setupOpenGL();										// initialize all of the OpenGL specific information
@@ -733,6 +814,8 @@ int main( int argc, char *argv[] ) {
   CSCI441::OpenGLUtils::printOpenGLInfo();
 
 	setupShaders( "shaders/customShader.v.glsl", "shaders/customShader.f.glsl" ); // load our shader program into memory
+	setupObjShaders( "shaders/objShader.v.glsl", "shaders/objShader.f.glsl" ); // load our shader program into memory
+	setupObject( argv[1] );
 	setupBuffers();										// load all our VAOs and VBOs into memory
 	setupTextures();
 	
