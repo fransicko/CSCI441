@@ -15,7 +15,7 @@
   */
 
 #ifdef __CSCI441_OBJECTS_HPP__
-#error cannot include both CSCI441/objects.h and CSCI441/objects3.h
+	#error cannot include both CSCI441/objects.h and CSCI441/objects3.h
 #else
 
 #ifndef __CSCI441_OBJECTS_3_HPP__
@@ -23,18 +23,12 @@
 
 #include <GL/glew.h>
 
-#ifdef __APPLE__
-	#include <OpenGL/gl.h>
-#else
-	#include <GL/gl.h>
-#endif
+#include <assert.h>   					// for assert()
+#include <math.h>								// for cos(), sin()
 
-#include <assert.h>   // for assert()
-#include <math.h>			// for cos(), sin()
+#include <CSCI441/teapot3.hpp> 	// for teapot()
 
-#include <CSCI441/teapot3.hpp> // for teapot()
-
-#include <map>				// for map
+#include <map>									// for map
 
 ////////////////////////////////////////////////////////////////////////////////////
 
@@ -287,13 +281,13 @@ namespace CSCI441_INTERNAL {
 	void drawSphere( GLdouble radius, GLint stacks, GLint slices, GLenum renderMode );
 	void drawTorus( GLdouble innerRadius, GLdouble outerRadius, GLint sides, GLint rings, GLenum renderMode );
 
-	GLint _positionLocation = -1;
-	GLint _normalLocation = -1;
-	GLint _texCoordLocation = -1;
+	static GLint _positionLocation = -1;
+	static GLint _normalLocation = -1;
+	static GLint _texCoordLocation = -1;
 
 	void generateCubeVAO( GLdouble sideLength );
-	std::map< GLdouble, GLuint > _cubeVAO;
-	std::map< GLdouble, GLuint > _cubeVBO;
+	static std::map< GLdouble, GLuint > _cubeVAO;
+	static std::map< GLdouble, GLuint > _cubeVBO;
 
 	struct CylinderData {
 		GLdouble b, t, h;
@@ -308,8 +302,8 @@ namespace CSCI441_INTERNAL {
 		}
 	};
 	void generateCylinderVAO( CylinderData cylData );
-	std::map< CylinderData, GLuint > _cylinderVAO;
-	std::map< CylinderData, GLuint > _cylinderVBO;
+	static std::map< CylinderData, GLuint > _cylinderVAO;
+	static std::map< CylinderData, GLuint > _cylinderVBO;
 
 	struct DiskData {
 		GLdouble i, o, st, sw;
@@ -325,8 +319,8 @@ namespace CSCI441_INTERNAL {
 		}
 	};
 	void generateDiskVAO( DiskData diskData );
-	std::map< DiskData, GLuint > _diskVAO;
-	std::map< DiskData, GLuint > _diskVBO;
+	static std::map< DiskData, GLuint > _diskVAO;
+	static std::map< DiskData, GLuint > _diskVBO;
 
 	struct SphereData {
 		GLdouble r;
@@ -339,8 +333,8 @@ namespace CSCI441_INTERNAL {
 		}
 	};
 	void generateSphereVAO( SphereData sphereData );
-	std::map< SphereData, GLuint > _sphereVAO;
-	std::map< SphereData, GLuint > _sphereVBO;
+	static std::map< SphereData, GLuint > _sphereVAO;
+	static std::map< SphereData, GLuint > _sphereVBO;
 
 	struct TorusData {
 		GLdouble i, o;
@@ -354,8 +348,8 @@ namespace CSCI441_INTERNAL {
 		}
 	};
 	void generateTorusVAO( TorusData torusData );
-	std::map< TorusData, GLuint > _torusVAO;
-	std::map< TorusData, GLuint > _torusVBO;
+	static std::map< TorusData, GLuint > _torusVAO;
+	static std::map< TorusData, GLuint > _torusVBO;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -899,8 +893,8 @@ inline void CSCI441_INTERNAL::generateSphereVAO( SphereData sphereData ) {
 			normals[ idx*3 + 1 ] = -cos( phi );
 			normals[ idx*3 + 2 ] =  sin( theta )*sin( phi );
 
-			texCoords[ idx*2 + 0 ] = stackNum / sphereData.st;
-			texCoords[ idx*2 + 1 ] = sliceNum / sphereData.sl;
+			texCoords[ idx*2 + 0 ] = theta / 6.28;
+			texCoords[ idx*2 + 1 ] = phi / 3.14;
 
 			vertices[ idx*3 + 0 ] = -cos( theta )*sin( phi )*sphereData.r;
 			vertices[ idx*3 + 1 ] = -cos( phi )*sphereData.r;
@@ -912,8 +906,8 @@ inline void CSCI441_INTERNAL::generateSphereVAO( SphereData sphereData ) {
 			normals[ idx*3 + 1 ] = -cos( phiNext );
 			normals[ idx*3 + 2 ] =  sin( theta )*sin( phiNext );
 
-			texCoords[ idx*2 + 0 ] = (stackNum+1) / sphereData.st;
-			texCoords[ idx*2 + 1 ] = sliceNum / sphereData.sl;
+			texCoords[ idx*2 + 0 ] = theta / 6.28;
+			texCoords[ idx*2 + 1 ] = phiNext / 3.14;
 
 			vertices[ idx*3 + 0 ] = -cos( theta )*sin( phiNext )*sphereData.r;
 			vertices[ idx*3 + 1 ] = -cos( phiNext )*sphereData.r;

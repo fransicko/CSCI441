@@ -24,11 +24,11 @@
 
 namespace CSCI441_INTERNAL {
 
-	GLuint vao_teapot;
-	GLuint vbo_teapot_vertices, ibo_teapot_elements;
+	static GLuint vao_teapot;
+	static GLuint vbo_teapot_vertices, ibo_teapot_elements;
 
 	struct vertex { GLfloat x, y, z; };
-	struct vertex teapot_cp_vertices[] = {
+	static struct vertex teapot_cp_vertices[] = {
 	  // 1
 	  {  1.4   ,   0.0   ,  2.4     },
 	  {  1.4   ,  -0.784 ,  2.4     },
@@ -328,7 +328,7 @@ namespace CSCI441_INTERNAL {
 	};
 	#define TEAPOT_NB_PATCHES 28
 	#define ORDER 3
-	GLushort teapot_patches[][ORDER+1][ORDER+1] = {
+	static GLushort teapot_patches[][ORDER+1][ORDER+1] = {
 	  // rim
 	  { {   1,   2,   3,   4 }, {   5,   6,   7,   8 }, {   9,  10,  11,  12 }, {  13,  14,  15,  16, } },
 	  { {   4,  17,  18,  19 }, {   8,  20,  21,  22 }, {  12,  23,  24,  25 }, {  16,  26,  27,  28, } },
@@ -366,10 +366,10 @@ namespace CSCI441_INTERNAL {
 	};
 	#define RESU 10
 	#define RESV 10
-	struct vertex teapot_vertices[TEAPOT_NB_PATCHES * RESU*RESV*2];
-	GLushort teapot_elements[TEAPOT_NB_PATCHES * (RESU-1)*(RESV-1) * 2*3];
+	static struct vertex teapot_vertices[TEAPOT_NB_PATCHES * RESU*RESV*2];
+	static GLushort teapot_elements[TEAPOT_NB_PATCHES * (RESU-1)*(RESV-1) * 2*3];
 
-	bool teapotBuilt = false;
+	static bool teapotBuilt = false;
 
 	void build_control_points_k(int p, struct vertex control_points_k[][ORDER+1]);
 	struct vertex compute_position(struct vertex control_points_k[][ORDER+1], float u, float v);
@@ -378,7 +378,7 @@ namespace CSCI441_INTERNAL {
 	float binomial_coefficient(int i, int n);
 	int factorial(int n);
 
-	void build_teapot() {
+	inline void build_teapot() {
 	  // Vertices
 	  for (int p = 0; p < TEAPOT_NB_PATCHES; p++) {
 	    struct vertex control_points_k[ORDER+1][ORDER+1];
@@ -411,13 +411,13 @@ namespace CSCI441_INTERNAL {
 
 	}
 
-	void build_control_points_k(int p, struct vertex control_points_k[][ORDER+1]) {
+	inline void build_control_points_k(int p, struct vertex control_points_k[][ORDER+1]) {
 	  for (int i = 0; i <= ORDER; i++)
 	    for (int j = 0; j <= ORDER; j++)
 	      control_points_k[i][j] = teapot_cp_vertices[teapot_patches[p][i][j] - 1];
 	}
 
-	struct vertex compute_position(struct vertex control_points_k[][ORDER+1], float u, float v) {
+	inline struct vertex compute_position(struct vertex control_points_k[][ORDER+1], float u, float v) {
 	  struct vertex result = { 0.0, 0.0, 0.0 };
 	  for (int i = 0; i <= ORDER; i++) {
 	    float poly_i = bernstein_polynomial(i, ORDER, u);
@@ -431,7 +431,8 @@ namespace CSCI441_INTERNAL {
 	  return result;
 	}
 
-	struct vertex compute_normal(struct vertex control_points_k[][ORDER+1], float u, float v) {
+	// TODO compute normal based on partial derivatives of surface patch
+	inline struct vertex compute_normal(struct vertex control_points_k[][ORDER+1], float u, float v) {
 	  struct vertex result = { 0.0, 0.0, 0.0 };
 	  for (int i = 0; i <= ORDER; i++) {
 	    float poly_i = bernstein_polynomial(i, ORDER, u);
@@ -445,15 +446,15 @@ namespace CSCI441_INTERNAL {
 	  return result;
 	}
 
-	float bernstein_polynomial(int i, int n, float u) {
+	inline float bernstein_polynomial(int i, int n, float u) {
 	  return binomial_coefficient(i, n) * powf(u, i) * powf(1-u, n-i);
 	}
 
-	float binomial_coefficient(int i, int n) {
+	inline float binomial_coefficient(int i, int n) {
 	  assert(i >= 0); assert(n >= 0);
 	  return 1.0f * factorial(n) / (factorial(i) * factorial(n-i));
 	}
-	int factorial(int n) {
+	inline int factorial(int n) {
 	  assert(n >= 0);
 	  int result = 1;
 	  for (int i = n; i > 1; i--)
@@ -461,7 +462,7 @@ namespace CSCI441_INTERNAL {
 	  return result;
 	}
 
-	int init_resources()
+	inline int init_resources()
 	{
 	  build_teapot();
 
@@ -481,7 +482,7 @@ namespace CSCI441_INTERNAL {
 	  return 1;
 	}
 
-	void teapot( GLdouble size, GLint positionLocation, GLint normalLocation ) {
+	inline void teapot( GLdouble size, GLint positionLocation, GLint normalLocation ) {
 		if( !teapotBuilt ) {
 			init_resources();
 		}

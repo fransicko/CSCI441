@@ -162,9 +162,11 @@ void CSCI441_INTERNAL::ShaderUtils::printLog( GLuint handle ) {
 }
 
 void CSCI441_INTERNAL::ShaderUtils::printSubroutineInfo( GLuint handle, GLenum shaderStage ) {
-	int params, params2;
-	
+	int params = 0, params2 = 0;
+	int *params3 = NULL;
+
 	glGetProgramStageiv(handle, shaderStage, GL_ACTIVE_SUBROUTINE_UNIFORMS, &params);
+
 	printf("[INFO]: | GL_ACTIVE_SUBROUTINE_UNIFORMS (%-15s): %5i |\n", CSCI441_INTERNAL::ShaderUtils::GL_shader_type_to_string(shaderStage), params);
 	for(int i = 0; i < params; i++ ) {
 		char name[64];
@@ -173,9 +175,6 @@ void CSCI441_INTERNAL::ShaderUtils::printSubroutineInfo( GLuint handle, GLenum s
 
 		glGetActiveSubroutineUniformName( handle, shaderStage, i, max_length, &actual_length, name );
 		glGetActiveSubroutineUniformiv( handle, shaderStage, i, GL_NUM_COMPATIBLE_SUBROUTINES, &params2 );
-		
-		int* params3 = (int*)malloc(sizeof(int)*params2);
-		
 		glGetActiveSubroutineUniformiv( handle, shaderStage, i, GL_COMPATIBLE_SUBROUTINES, params3 );
 		GLint loc = glGetSubroutineUniformLocation( handle, shaderStage, name );
 
@@ -361,17 +360,18 @@ void CSCI441_INTERNAL::ShaderUtils::printShaderProgramInfo( GLuint handle ) {
 
 
 
-	if( sDEBUG && false ) {
-		printf( "[INFO]: >--------------------------------------------------------<\n");
-		if( hasVertexShader   ) printSubroutineInfo( handle, GL_VERTEX_SHADER );
-		if( hasTessControlShader) printSubroutineInfo( handle, GL_TESS_CONTROL_SHADER );
-		if( hasTessEvalShader) printSubroutineInfo( handle, GL_TESS_EVALUATION_SHADER );
-		if( hasGeometryShader ) printSubroutineInfo( handle, GL_GEOMETRY_SHADER );
-		if( hasFragmentShader ) printSubroutineInfo( handle, GL_FRAGMENT_SHADER );
-		printf( "[INFO]: \\--------------------------------------------------------/\n\n");
-	}
-	
-	if( sDEBUG) {
+	if( sDEBUG ) {
+		GLint major, minor;
+		glGetIntegerv(GL_MAJOR_VERSION, &major);
+		glGetIntegerv(GL_MINOR_VERSION, &minor);
+		if( major >= 4 ) {
+			printf( "[INFO]: >--------------------------------------------------------<\n");
+			if( hasVertexShader   ) printSubroutineInfo( handle, GL_VERTEX_SHADER );
+			if( hasTessControlShader) printSubroutineInfo( handle, GL_TESS_CONTROL_SHADER );
+			if( hasTessEvalShader) printSubroutineInfo( handle, GL_TESS_EVALUATION_SHADER );
+			if( hasGeometryShader ) printSubroutineInfo( handle, GL_GEOMETRY_SHADER );
+			if( hasFragmentShader ) printSubroutineInfo( handle, GL_FRAGMENT_SHADER );
+		}
 		printf( "[INFO]: \\--------------------------------------------------------/\n\n");
 	}
 }

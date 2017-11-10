@@ -1,5 +1,5 @@
 /** @file OpenGLUtils3.hpp
-  * @brief Helper functions to work with OpenGL
+  * @brief Helper functions to work with OpenGL 3.0+
 	* @author Dr. Jeffrey Paone
 	* @date Last Edit: 25 Oct 2017
 	* @version 1.3
@@ -60,18 +60,14 @@ namespace CSCI441 {
 		  */
 		DEPRECATED(void popMatrix( glm::mat4 mtx ));
 
-    /** @class OpenGLUtils
-      * @brief static class containing OpenGL Utilities
+    /** @namespace OpenGLUtils
+      * @brief contains OpenGL Utility functions
       */
-    class OpenGLUtils {
-    	public:
-        /** @brief Prints information about our OpenGL context
+    namespace OpenGLUtils {
+    	  /** @brief Prints information about our OpenGL context
           *
           */
-    		static void printOpenGLInfo();
-
-    	private:
-    		OpenGLUtils();
+    		void printOpenGLInfo();
   	};
 
 		/** @struct MaterialStruct
@@ -252,8 +248,6 @@ inline void CSCI441::OpenGLUtils::printOpenGLInfo() {
 
 	fprintf( stdout, "[INFO]: \\--------------------------------------------------------/\n\n");
 }
-
-inline CSCI441::OpenGLUtils::OpenGLUtils() {}
 
 inline void CSCI441::setMaterial( MaterialStruct material ) {
 	glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, &material.diffuseColor[0] );
