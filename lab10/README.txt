@@ -10,3 +10,10 @@ Q3 : We are working with primitives in eye space before they are passed to clip 
 
 Q4 : We need to draw back from front so that our depth buffer knows what is behind the snowflacks so it doesn'that
      render the balck background.
+	 
+Q5 : It helped clean up some confusion wiht GLSL/GLEW.
+
+Q6 : 8
+Q7 : The write up wasa goood
+Q8 : 1:30hr
+Q9 : No
