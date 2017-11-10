@@ -56,8 +56,14 @@ GLuint shaderProgramHandle = 0;
 GLint mvp_uniform_location = -1, time_uniform_location = -1;
 GLint vpos_attrib_location = -1, text_coor_location = -1;
 
-GLuint platformTextureHandle;
+GLuint platformTextureHandle, frontTextureHandle, backTextureHandle, ceilTextureHandle, leftTextureHandle, rightTextureHandle;
 GLuint vaods;
+GLuint vaodCeil;
+GLuint vaodFloor;
+GLuint vaodFront;
+GLuint vaodBack;
+GLuint vaodRight;
+GLuint vaodLeft;
 GLuint vbod;
 
 //******************************************************************************
@@ -93,7 +99,7 @@ GLuint loadAndRegisterTexture( const char *filename ) {
 			printf( "[ERROR]: Could not load texture \"%s\"\n[SOIL]: %s\n", filename, SOIL_last_result() );
 	} else {
 			printf( "[INFO]: Successfully loaded texture \"%s\"\n[SOIL]: %s\n", filename, SOIL_last_result() );
-			glBindTexture(   GL_TEXTURE_2D,  platformTextureHandle );
+			glBindTexture(   GL_TEXTURE_2D,  texHandle );
 			glTexParameteri( GL_TEXTURE_2D,  GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 			glTexParameteri( GL_TEXTURE_2D,  GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 			glTexParameteri( GL_TEXTURE_2D,  GL_TEXTURE_WRAP_S,     GL_REPEAT );
@@ -352,6 +358,11 @@ void setupShaders( const char *vertexShaderFilename, const char *fragmentShaderF
 ////////////////////////////////////////////////////////////////////////////////
 void setupTextures() {
 	platformTextureHandle = loadAndRegisterTexture( "textures/skybox/dark-ground.jpg" );
+	frontTextureHandle = loadAndRegisterTexture( "textures/skybox/dark-castle.jpg" );
+	backTextureHandle = loadAndRegisterTexture( "textures/skybox/dark-forest.png" );
+	rightTextureHandle = loadAndRegisterTexture( "textures/skybox/dark-forest.png" );
+	leftTextureHandle = loadAndRegisterTexture( "textures/skybox/dark-forest.png" );
+	ceilTextureHandle = loadAndRegisterTexture( "textures/skybox/dark-cloud.jpg" );
 }
 
 
@@ -369,12 +380,13 @@ void setupBuffers() {
 		float x, y, z, s, t;
 	};
 
+	// Plate
 	// TODO #02: create our platform vertex array
 	VertexTextured vertexArr[4] = {
-		{-10, -1, -10, 0, 0}, 
-		{10, -1, -10, 1, 0},
-		{10, -1, 10, 1, 1},
-		{-10, -1, 10, 0, 1}
+		{-5, -1, -5, 0, 0}, 
+		{5, -1, -5, 1, 0},
+		{5, -1, 5, 1, 1},
+		{-5, -1, 5, 0, 1}
 	};
 
   // TODO #03: create the index array
@@ -403,6 +415,222 @@ void setupBuffers() {
 	glGenBuffers(1, &vbod);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbod);
 	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof(indexArray), indexArray, GL_STATIC_DRAW );
+	
+	
+	// FLOOR
+	VertexTextured vertexArrFl[4] = {
+		{-20, -20, -20, 0, 0}, 
+		{20, -20, -20, 1, 0},
+		{20, -20, 20, 1, 1},
+		{-20, -20, 20, 0, 1}
+	};
+
+  // TODO #03: create the index array
+  unsigned short indexArrayFl[6] = {0, 1, 2, 2, 3, 0};
+
+	// TODO #04B: generate and bind the VAO
+	glGenVertexArrays(1, &vaodFloor);
+	glBindVertexArray(vaodFloor);
+	
+	// TODO #05A: generate and bind the array VBO
+	glGenBuffers(1, &vbod);
+	glBindBuffer(GL_ARRAY_BUFFER, vbod);
+
+	// TODO #05B: send the vertex data to the GPU
+	glBufferData( GL_ARRAY_BUFFER, sizeof(vertexArrFl), vertexArrFl, GL_STATIC_DRAW );
+
+	// TODO #06A: state where the vertex position is located within our array data
+	glEnableVertexAttribArray( vpos_attrib_location );
+	glVertexAttribPointer( vpos_attrib_location, 3, GL_FLOAT, GL_FALSE, sizeof( VertexTextured ), (void*)0 );
+
+	// TODO #06B: state where the texture coordinate is located within our array data
+	glEnableVertexAttribArray( text_coor_location );
+	glVertexAttribPointer( text_coor_location, 2, GL_FLOAT, GL_FALSE, sizeof( VertexTextured ), (void*)(sizeof(float) * 3));
+
+	// TODO #07: generate and bind the element array VBO.  send data to the GPU
+	glGenBuffers(1, &vbod);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbod);
+	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof(indexArrayFl), indexArrayFl, GL_STATIC_DRAW );
+	
+	
+	// CEIL
+	VertexTextured vertexArrC[4] = {
+		{-20, 20, -20, 0, 0}, 
+		{20, 20, -20, 1, 0},
+		{20, 20, 20, 1, 1},
+		{-20, 20, 20, 0, 1}
+	};
+
+  // TODO #03: create the index array
+  unsigned short indexArrayC[6] = {0, 1, 2, 2, 3, 0};
+
+	// TODO #04B: generate and bind the VAO
+	glGenVertexArrays(1, &vaodCeil);
+	glBindVertexArray(vaodCeil);
+	
+	// TODO #05A: generate and bind the array VBO
+	glGenBuffers(1, &vbod);
+	glBindBuffer(GL_ARRAY_BUFFER, vbod);
+
+	// TODO #05B: send the vertex data to the GPU
+	glBufferData( GL_ARRAY_BUFFER, sizeof(vertexArrC), vertexArrC, GL_STATIC_DRAW );
+
+	// TODO #06A: state where the vertex position is located within our array data
+	glEnableVertexAttribArray( vpos_attrib_location );
+	glVertexAttribPointer( vpos_attrib_location, 3, GL_FLOAT, GL_FALSE, sizeof( VertexTextured ), (void*)0 );
+
+	// TODO #06B: state where the texture coordinate is located within our array data
+	glEnableVertexAttribArray( text_coor_location );
+	glVertexAttribPointer( text_coor_location, 2, GL_FLOAT, GL_FALSE, sizeof( VertexTextured ), (void*)(sizeof(float) * 3));
+
+	// TODO #07: generate and bind the element array VBO.  send data to the GPU
+	glGenBuffers(1, &vbod);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbod);
+	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof(indexArrayC), indexArrayC, GL_STATIC_DRAW );
+	
+	
+	// FRONT
+	VertexTextured vertexArrFr[4] = {
+		{-20, -20, 20, 0, 0}, 
+		{20, -20, 20, 1, 0},
+		{20, 20, 20, 1, 1},
+		{-20, 20, 20, 0, 1}
+	};
+
+  // TODO #03: create the index array
+  unsigned short indexArrayFr[6] = {0, 1, 2, 2, 3, 0};
+
+	// TODO #04B: generate and bind the VAO
+	glGenVertexArrays(1, &vaodFront);
+	glBindVertexArray(vaodFront);
+	
+	// TODO #05A: generate and bind the array VBO
+	glGenBuffers(1, &vbod);
+	glBindBuffer(GL_ARRAY_BUFFER, vbod);
+
+	// TODO #05B: send the vertex data to the GPU
+	glBufferData( GL_ARRAY_BUFFER, sizeof(vertexArrFr), vertexArrFr, GL_STATIC_DRAW );
+
+	// TODO #06A: state where the vertex position is located within our array data
+	glEnableVertexAttribArray( vpos_attrib_location );
+	glVertexAttribPointer( vpos_attrib_location, 3, GL_FLOAT, GL_FALSE, sizeof( VertexTextured ), (void*)0 );
+
+	// TODO #06B: state where the texture coordinate is located within our array data
+	glEnableVertexAttribArray( text_coor_location );
+	glVertexAttribPointer( text_coor_location, 2, GL_FLOAT, GL_FALSE, sizeof( VertexTextured ), (void*)(sizeof(float) * 3));
+
+	// TODO #07: generate and bind the element array VBO.  send data to the GPU
+	glGenBuffers(1, &vbod);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbod);
+	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof(indexArrayFr), indexArrayFr, GL_STATIC_DRAW );
+	
+	
+	//BACK
+	VertexTextured vertexArrBr[4] = {
+		{-20, -20, -20, 0, 0}, 
+		{20, -20, -20, 1, 0},
+		{20, 20, -20, 1, 1},
+		{-20, 20, -20, 0, 1}
+	};
+
+  // TODO #03: create the index array
+  unsigned short indexArrayBr[6] = {0, 1, 2, 2, 3, 0};
+
+	// TODO #04B: generate and bind the VAO
+	glGenVertexArrays(1, &vaodBack);
+	glBindVertexArray(vaodBack);
+	
+	// TODO #05A: generate and bind the array VBO
+	glGenBuffers(1, &vbod);
+	glBindBuffer(GL_ARRAY_BUFFER, vbod);
+
+	// TODO #05B: send the vertex data to the GPU
+	glBufferData( GL_ARRAY_BUFFER, sizeof(vertexArrBr), vertexArrBr, GL_STATIC_DRAW );
+
+	// TODO #06A: state where the vertex position is located within our array data
+	glEnableVertexAttribArray( vpos_attrib_location );
+	glVertexAttribPointer( vpos_attrib_location, 3, GL_FLOAT, GL_FALSE, sizeof( VertexTextured ), (void*)0 );
+
+	// TODO #06B: state where the texture coordinate is located within our array data
+	glEnableVertexAttribArray( text_coor_location );
+	glVertexAttribPointer( text_coor_location, 2, GL_FLOAT, GL_FALSE, sizeof( VertexTextured ), (void*)(sizeof(float) * 3));
+
+	// TODO #07: generate and bind the element array VBO.  send data to the GPU
+	glGenBuffers(1, &vbod);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbod);
+	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof(indexArrayBr), indexArrayBr, GL_STATIC_DRAW );
+	
+	
+	//RIGHT
+	VertexTextured vertexArrR[4] = {
+		{-20, -20, -20, 0, 0}, 
+		{-20, -20, 20, 1, 0},
+		{-20, 20, 20, 1, 1},
+		{-20, 20, -20, 0, 1}
+	};
+
+  // TODO #03: create the index array
+  unsigned short indexArrayR[6] = {0, 1, 2, 2, 3, 0};
+
+	// TODO #04B: generate and bind the VAO
+	glGenVertexArrays(1, &vaodRight);
+	glBindVertexArray(vaodRight);
+	
+	// TODO #05A: generate and bind the array VBO
+	glGenBuffers(1, &vbod);
+	glBindBuffer(GL_ARRAY_BUFFER, vbod);
+
+	// TODO #05B: send the vertex data to the GPU
+	glBufferData( GL_ARRAY_BUFFER, sizeof(vertexArrR), vertexArrR, GL_STATIC_DRAW );
+
+	// TODO #06A: state where the vertex position is located within our array data
+	glEnableVertexAttribArray( vpos_attrib_location );
+	glVertexAttribPointer( vpos_attrib_location, 3, GL_FLOAT, GL_FALSE, sizeof( VertexTextured ), (void*)0 );
+
+	// TODO #06B: state where the texture coordinate is located within our array data
+	glEnableVertexAttribArray( text_coor_location );
+	glVertexAttribPointer( text_coor_location, 2, GL_FLOAT, GL_FALSE, sizeof( VertexTextured ), (void*)(sizeof(float) * 3));
+
+	// TODO #07: generate and bind the element array VBO.  send data to the GPU
+	glGenBuffers(1, &vbod);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbod);
+	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof(indexArrayR), indexArrayR, GL_STATIC_DRAW );
+	
+	
+	//LEFT
+	VertexTextured vertexArrL[4] = {
+		{20, -20, -20, 0, 0}, 
+		{20, -20, 20, 1, 0},
+		{20, 20, 20, 1, 1},
+		{20, 20, -20, 0, 1}
+	};
+
+  // TODO #03: create the index array
+  unsigned short indexArrayL[6] = {0, 1, 2, 2, 3, 0};
+
+	// TODO #04B: generate and bind the VAO
+	glGenVertexArrays(1, &vaodLeft);
+	glBindVertexArray(vaodLeft);
+	
+	// TODO #05A: generate and bind the array VBO
+	glGenBuffers(1, &vbod);
+	glBindBuffer(GL_ARRAY_BUFFER, vbod);
+
+	// TODO #05B: send the vertex data to the GPU
+	glBufferData( GL_ARRAY_BUFFER, sizeof(vertexArrL), vertexArrL, GL_STATIC_DRAW );
+
+	// TODO #06A: state where the vertex position is located within our array data
+	glEnableVertexAttribArray( vpos_attrib_location );
+	glVertexAttribPointer( vpos_attrib_location, 3, GL_FLOAT, GL_FALSE, sizeof( VertexTextured ), (void*)0 );
+
+	// TODO #06B: state where the texture coordinate is located within our array data
+	glEnableVertexAttribArray( text_coor_location );
+	glVertexAttribPointer( text_coor_location, 2, GL_FLOAT, GL_FALSE, sizeof( VertexTextured ), (void*)(sizeof(float) * 3));
+
+	// TODO #07: generate and bind the element array VBO.  send data to the GPU
+	glGenBuffers(1, &vbod);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbod);
+	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof(indexArrayL), indexArrayL, GL_STATIC_DRAW );
 }
 
 //******************************************************************************
@@ -445,10 +673,36 @@ void renderScene( glm::mat4 viewMtx, glm::mat4 projMtx ) {
   }
   */
   
-  // TODO #08: draw the platform!
-	glEnable(GL_TEXTURE);
+  // Draw the skybox
+	//glEnable(GL_TEXTURE);
 	glBindTexture(   GL_TEXTURE_2D,  platformTextureHandle );
 	glBindVertexArray(vaods);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)0);
+	
+	// using the same texture for the ground and platform 
+	glBindTexture(   GL_TEXTURE_2D,  platformTextureHandle );
+	glBindVertexArray(vaodFloor);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)0);
+	
+	// using the same texture for the ground and platform 
+	glBindTexture(   GL_TEXTURE_2D,  frontTextureHandle );
+	glBindVertexArray(vaodFront);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)0);
+	
+	glBindTexture(   GL_TEXTURE_2D,  ceilTextureHandle );
+	glBindVertexArray(vaodCeil);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)0);
+	
+	glBindTexture(   GL_TEXTURE_2D,  backTextureHandle );
+	glBindVertexArray(vaodBack);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)0);
+	
+	glBindTexture(   GL_TEXTURE_2D,  rightTextureHandle );
+	glBindVertexArray(vaodRight);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)0);
+	
+	glBindTexture(   GL_TEXTURE_2D,  leftTextureHandle );
+	glBindVertexArray(vaodLeft);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)0);
 }
 
@@ -463,12 +717,13 @@ void renderScene( glm::mat4 viewMtx, glm::mat4 projMtx ) {
 ////////////////////////////////////////////////////////////////////////////////
 int main( int argc, char *argv[] ) {
   // ensure proper number of arguments provided at runtime
+  /*
 	if( argc != 3 ) {
     // we need a vertex and fragment shader
 		fprintf( stderr, "Usage: ./a5 <shader.v.glsl> <shader.f.glsl>\n" );
 		exit(EXIT_FAILURE);
 	}
-
+	*/
   // GLFW sets up our OpenGL context so must be done first
 	GLFWwindow *window = setupGLFW();	// initialize all of the GLFW specific information releated to OpenGL and our window
 	setupOpenGL();										// initialize all of the OpenGL specific information
@@ -477,7 +732,7 @@ int main( int argc, char *argv[] ) {
 
   CSCI441::OpenGLUtils::printOpenGLInfo();
 
-	setupShaders( argv[1], argv[2] ); // load our shader program into memory
+	setupShaders( "shaders/customShader.v.glsl", "shaders/customShader.f.glsl" ); // load our shader program into memory
 	setupBuffers();										// load all our VAOs and VBOs into memory
 	setupTextures();
 	
