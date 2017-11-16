@@ -1,17 +1,7 @@
 Author: Michael Villafuerte
 
-Assignment 5: The Main Attraction
-
-DESCRIPTION
-	This program will display a user inputted object file surrounded by a sky box.
-	The object will undergo the Blinn-Phong shading model.
-	
-USAGE
-	Simply tip 'make' and run ./a5.exe <file>.object.
-	Hold ctrl+left click to zoom in and out.
-	
-	
-This assignment took about 12~ hrs.
-The labs were the foundation for this assignment 10.
-Since I turned in this lab late it helped me to learn shaders so 8.
-
+NOTES: 
+	We have a change in position. We need to get the particle to be shot out of the spot position
+	at the given angle spread around teh spot and not just from the same direction. The initial velocity
+	for each dimension will be calculated using an angle times the initla velocity. Thinking x and z might
+	use the same cos angle

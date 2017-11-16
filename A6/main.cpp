@@ -923,6 +923,8 @@ int main( int argc, char *argv[] ) {
 	}
 	
 	*/
+	
+	// Need to read in a file
   // GLFW sets up our OpenGL context so must be done first
 	GLFWwindow *window = setupGLFW();	// initialize all of the GLFW specific information releated to OpenGL and our window
 	setupOpenGL();										// initialize all of the OpenGL specific information
