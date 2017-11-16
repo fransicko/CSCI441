@@ -24,12 +24,15 @@
 #include <SOIL/SOIL.h>		// for image loading
 #include <stdio.h>				// for printf functionality
 #include <stdlib.h>				// for exit functionality
+#include <time.h>					// for time functionality
 
 // note that all of these headers end in *3.hpp
 // these class library files will only work with OpenGL 3.0+
 #include <CSCI441/modelLoader3.hpp> // to load in OBJ models
 #include <CSCI441/OpenGLUtils3.hpp> // to print info about OpenGL
 #include <CSCI441/objects3.hpp>     // to render our 3D primitives
+#include <CSCI441/ShaderProgram3.hpp>   // our shader helper functions
+#include <CSCI441/TextureUtils.hpp>   // our texture helper functions
 
 #include "include/Shader_Utils.h"   // our shader helper functions
 
@@ -84,6 +87,18 @@ GLuint vaodRight;
 GLuint vaodLeft;
 GLuint vbod;
 
+// Lab 10
+CSCI441::ShaderProgram *snowShaderProgram = NULL;
+GLint snow_modelview_uniform_location, snow_projection_uniform_location;
+GLint snow_vpos_attrib_location;
+
+const int NUM_POINTS = 20;
+struct Vertex { GLfloat x, y, z; };
+Vertex points[NUM_POINTS];
+GLuint pointsVAO, pointsVBO;
+
+GLuint textureHandle;
+
 //******************************************************************************
 //
 // Helper Functions
@@ -101,6 +116,9 @@ void convertSphericalToCartesian() {
 	eyePoint.z = cameraAngles.z * -cosf( cameraAngles.x ) * sinf( cameraAngles.y );
 }
 
+GLfloat randNumber( int max ) {
+	return rand() / (GLfloat)RAND_MAX * max * 2.0 - max;
+}
 
 // loadAndRegisterTexture() ////////////////////////////////////////////////////
 //
@@ -395,6 +413,22 @@ void setupObjShaders( const char *vertexShaderFilename, const char *fragmentShad
 	normalHandle = glGetAttribLocation(objectProgramHandle, "normalHandle");
 }
 
+// setupSnowShaders() //////////////////////////////////////////////////////////////
+//
+//      Create our shaders.  Send GLSL code to GPU to be compiled.  Also get
+//  handles to our uniform and attribute locations.
+//
+////////////////////////////////////////////////////////////////////////////////
+void setupSnowShaders() {
+	// LOOKHERE #1
+	snowShaderProgram = new CSCI441::ShaderProgram( "shaders/billboardQuadShader.v.glsl",
+																							"shaders/billboardQuadShader.g.glsl",
+																						  "shaders/billboardQuadShader.f.glsl" );
+	snow_modelview_uniform_location  = snowShaderProgram->getUniformLocation( "mvMatrix" );
+	snow_projection_uniform_location = snowShaderProgram->getUniformLocation( "projMatrix" );
+	snow_vpos_attrib_location			  = snowShaderProgram->getAttributeLocation( "vPos" );
+}
+
 // setupTextures() /////////////////////////////////////////////////////////////
 //
 //      Load and register all the tetures for our program
@@ -407,6 +441,7 @@ void setupTextures() {
 	rightTextureHandle = loadAndRegisterTexture( "textures/skybox/dark-forest.png" );
 	leftTextureHandle = loadAndRegisterTexture( "textures/skybox/dark-forest.png" );
 	ceilTextureHandle = loadAndRegisterTexture( "textures/skybox/dark-cloud.jpg" );
+	textureHandle = CSCI441::TextureUtils::loadAndRegisterTexture( "textures/snowflake.png" );
 }
 
 
@@ -680,6 +715,27 @@ void setupBuffers() {
 	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof(indexArrayL), indexArrayL, GL_STATIC_DRAW );
 }
 
+// setupSnowBuffers() //////////////////////////////////////////////////////////////
+//
+//      Create our VAOs & VBOs. Send vertex data to the GPU for future rendering
+//
+////////////////////////////////////////////////////////////////////////////////
+void setupSnowBuffers() {
+	// LOOKHERE #2
+	for( int i = 0; i < NUM_POINTS; i++ ) {
+		Vertex v = { randNumber(5), randNumber(5), randNumber(5) };
+		points[i] = v;
+	}
+
+	glGenVertexArrays( 1, &pointsVAO );
+	glBindVertexArray( pointsVAO );
+
+	glGenBuffers( 1, &pointsVBO );
+	glBindBuffer( GL_ARRAY_BUFFER, pointsVBO );
+	glBufferData( GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW );
+	glEnableVertexAttribArray( snow_vpos_attrib_location );
+	glVertexAttribPointer( snow_vpos_attrib_location, 3, GL_FLOAT, GL_FALSE, 0, (void*)0 );
+}
 //******************************************************************************
 //
 // Rendering / Drawing Functions - this is where the magic happens!
@@ -787,6 +843,67 @@ void renderScene( glm::mat4 viewMtx, glm::mat4 projMtx ) {
 	
 }
 
+void renderSnowScene( glm::mat4 viewMtx, glm::mat4 projMtx ) {
+	// LOOKHERE #3
+
+  // stores our model matrix
+  glm::mat4 modelMtx;
+
+  // use our shader program
+	snowShaderProgram->useProgram();
+
+  // precompute our MVP CPU side so it only needs to be computed once
+  glm::mat4 mvMtx = viewMtx * modelMtx;;
+  // send MVP to GPU
+  glUniformMatrix4fv(snow_modelview_uniform_location, 1, GL_FALSE, &mvMtx[0][0]);
+  glUniformMatrix4fv(snow_projection_uniform_location, 1, GL_FALSE, &projMtx[0][0]);
+
+	// TODO #1 : sort!
+	glm::vec3 vVec = lookAtPoint - eyePoint;
+    glm::normalize(vVec);
+	
+	int orderedInd[NUM_POINTS];
+	double distances[NUM_POINTS];
+	for (int i = 0; i < NUM_POINTS; ++i) {
+		glm::vec4 p = glm::vec4(points[i].x, points[i].y, points[i].z, 1) * modelMtx;
+		glm::vec4 ep = p - glm::vec4(eyePoint, 1);
+		
+		distances[i] = glm::dot(glm::vec4(vVec, 0), ep);
+		orderedInd[i] = i;
+	}
+	
+	for (unsigned int i = 0; i < NUM_POINTS; ++i) {
+		for (unsigned int j = i+1; j < NUM_POINTS; ++j) {
+			if (distances[i] < distances[j]) {
+				double c = distances[j];
+				distances[j] = distances[i];
+				distances[i] = c;
+				
+				int cc = orderedInd[j];
+				orderedInd[j] = orderedInd[i];
+				orderedInd[i] = cc;
+			}
+		}
+	}
+	
+	Vertex orderedPoints[NUM_POINTS];
+	for( unsigned int i = 0; i < NUM_POINTS; ++i) {
+		orderedPoints[i] = points[ orderedInd[i] ];
+	}
+	
+	glBindVertexArray( pointsVAO );
+	
+	// TODO #2 : send our sorted data
+	glBindBuffer(GL_ARRAY_BUFFER, pointsVBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(orderedPoints), orderedPoints);
+
+	
+
+	// LOOKHERE #4
+	glBindTexture( GL_TEXTURE_2D, textureHandle );
+	glDrawArrays( GL_POINTS, 0, NUM_POINTS );
+}
+
 ///*****************************************************************************
 //
 // Our main function
@@ -818,11 +935,15 @@ int main( int argc, char *argv[] ) {
 	setupObjShaders( "shaders/objShader.v.glsl", "shaders/objShader.f.glsl" ); // load our shader program into memory
 	setupObject( "models/suzanne.obj" );
 	setupBuffers();										// load all our VAOs and VBOs into memory
+	setupSnowShaders(); 									// load our shader program into memory
+	setupSnowBuffers();										// load all our VAOs and VBOs into memory
+	
 	setupTextures();
 	
   // needed to connect our 3D Object Library to our shader
 	// LOOKHERE #3
   CSCI441::setVertexAttributeLocations( vpos_attrib_location );
+  CSCI441::setVertexAttributeLocations( snow_vpos_attrib_location );
 
 	convertSphericalToCartesian();		// set up our camera position
 
@@ -852,6 +973,7 @@ int main( int argc, char *argv[] ) {
 		// draw everything to the window
 		// pass our view and projection matrices as well as deltaTime between frames
 		renderScene( viewMatrix, projectionMatrix );
+		renderSnowScene( viewMatrix, projectionMatrix );
 
 		glfwSwapBuffers(window);// flush the OpenGL commands and make sure they get rendered!
 		glfwPollEvents();				// check for any events and signal to redraw screen

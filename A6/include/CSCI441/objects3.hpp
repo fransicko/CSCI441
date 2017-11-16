@@ -296,7 +296,8 @@ namespace CSCI441_INTERNAL {
 	std::map< GLdouble, GLuint > _cubeVBO;
 
 	struct CylinderData {
-		GLdouble b, t, h, st, sl;
+		GLdouble b, t, h;
+		GLint st, sl;
 		bool operator<( const CylinderData rhs ) const {
 			bool result = b < rhs.b;
 			if( !result ) result = t < rhs.t;
@@ -311,7 +312,8 @@ namespace CSCI441_INTERNAL {
 	std::map< CylinderData, GLuint > _cylinderVBO;
 
 	struct DiskData {
-		GLdouble i, o, sl, r, st, sw;
+		GLdouble i, o, st, sw;
+		GLint sl, r;
 		bool operator<( const DiskData rhs ) const {
 			bool result = i < rhs.i;
 			if( !result ) result = o < rhs.o;
@@ -327,7 +329,8 @@ namespace CSCI441_INTERNAL {
 	std::map< DiskData, GLuint > _diskVBO;
 
 	struct SphereData {
-		GLdouble r, st, sl;
+		GLdouble r;
+		GLint st, sl;
 		bool operator<( const SphereData rhs ) const {
 			bool result = r < rhs.r;
 			if( !result ) result = st < rhs.st;
@@ -340,7 +343,8 @@ namespace CSCI441_INTERNAL {
 	std::map< SphereData, GLuint > _sphereVBO;
 
 	struct TorusData {
-		GLdouble i, o, s, r;
+		GLdouble i, o;
+		GLint s, r;
 		bool operator<( const TorusData rhs ) const {
 			bool result = i < rhs.i;
 			if( !result ) result = o < rhs.o;
@@ -551,7 +555,7 @@ inline void CSCI441_INTERNAL::drawCylinder( GLdouble base, GLdouble top, GLdoubl
 }
 
 inline void CSCI441_INTERNAL::drawPartialDisk( GLdouble inner, GLdouble outer, GLint slices, GLint rings, GLdouble start, GLdouble sweep, GLenum renderMode ) {
-	DiskData diskData = { inner, outer, slices, rings, start, sweep };
+	DiskData diskData = { inner, outer, start, sweep, slices, rings };
 	if( CSCI441_INTERNAL::_diskVAO.find( diskData ) == CSCI441_INTERNAL::_diskVAO.end() ) {
 		CSCI441_INTERNAL::generateDiskVAO( diskData );
 	}
