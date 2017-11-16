@@ -556,13 +556,47 @@ void renderScene( glm::mat4 viewMatrix, glm::mat4 projectionMatrix ) {
 
 void moveMarbles() {
 	// TODO #1 move every ball forward along its heading
+	for (unsigned int i = 0; i < marbles.size(); ++i) {
+		marbles.at(i)->moveForward();
+	}
 
 }
 
 void collideMarblesWithWall() {
 	// TODO #2 check if any ball passes beyond any wall
+	for (unsigned int i = 0; i < marbles.size(); ++i) {
+		if (marbles.at(i)->location.x > groundSize) {
+			glm::vec3 normal = glm::vec3(-1,0,0);	
+			marbles.at(i)->moveBackward();
+			
+			marbles.at(i)->direction = marbles.at(i)->direction - 2 * glm::dot(marbles.at(i)->direction, normal) * normal;
+		}
+		if (marbles.at(i)->location.x < -groundSize) {
+			glm::vec3 normal = glm::vec3(1,0,0);	
+			marbles.at(i)->moveBackward();
+			
+			marbles.at(i)->direction = marbles.at(i)->direction - 2 * glm::dot(marbles.at(i)->direction, normal) * normal;
+		}
+		
+		if (marbles.at(i)->location.z < -groundSize) {
+			glm::vec3 normal = glm::vec3(0,0,1);	
+			marbles.at(i)->moveBackward();
+			
+			marbles.at(i)->direction = marbles.at(i)->direction - 2 * glm::dot(marbles.at(i)->direction, normal) * normal;
+		}
+		
+		if (marbles.at(i)->location.z > groundSize) {
+			glm::vec3 normal = glm::vec3(0,0,-1);	
+			marbles.at(i)->moveBackward();
+			
+			marbles.at(i)->direction = marbles.at(i)->direction - 2 * glm::dot(marbles.at(i)->direction, normal) * normal;
+		}
+		
+	}
 
 }
+
+
 
 void collideMarblesWithEachother() {
 	// TODO #3
@@ -570,6 +604,26 @@ void collideMarblesWithEachother() {
 	// warning this isn't perfect...balls can get caught and
 	// continually bounce back-and-forth in place off
 	// each other
+	for (unsigned int i = 0; i < marbles.size()-1; ++i) {
+		for (unsigned int j = i+1; j < marbles.size(); ++j) {
+			if (glm::distance(marbles.at(i)->location, marbles.at(j)->location) < (marbles.at(i)->radius + marbles.at(j)->radius)) {
+				marbles.at(i)->moveBackward();
+				marbles.at(j)->moveBackward();
+				
+				glm::vec3 marAB = normalize(marbles.at(j)->location - marbles.at(i)->location);
+				glm::vec3 marBA = normalize(marbles.at(i)->location - marbles.at(j)->location);
+				
+				glm::vec3 marAIn = marbles.at(i)->direction;
+				glm::vec3 marBIn = marbles.at(j)->direction;
+				
+				marbles.at(i)->direction = marAIn - 2 * glm::dot(marAIn, marAB) * marAB;
+				marbles.at(j)->direction = marBIn - 2 * glm::dot(marBIn, marBA) * marBA;
+				
+				marbles.at(i)->moveForward();
+				marbles.at(j)->moveForward();
+			}
+		}
+	}
 
 }
 
