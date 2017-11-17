@@ -35,6 +35,7 @@
 #include <CSCI441/TextureUtils.hpp>   // our texture helper functions
 
 #include "include/Shader_Utils.h"   // our shader helper functions
+#include "include/Particle.h"
 
 //*************************************************************************************
 //
@@ -53,6 +54,9 @@ glm::vec3 upVector(    0.0f,  1.0f,  0.0f );
 
 int objectIndex = 2;
 
+// A6 globals for spawn location, angle of launch
+glm::vec3 spawn( 0.0f,  2.0f,  0.0f ); // TODO #A6 This will need to change later
+float angle = M_PI / 2;
 CSCI441::ModelLoader* model = NULL;
 
 GLuint shaderProgramHandle = 0;
@@ -95,6 +99,7 @@ GLint snow_vpos_attrib_location;
 const int NUM_POINTS = 20;
 struct Vertex { GLfloat x, y, z; };
 Vertex points[NUM_POINTS];
+Particle part[NUM_POINTS];
 GLuint pointsVAO, pointsVBO;
 
 GLuint textureHandle;
@@ -117,7 +122,8 @@ void convertSphericalToCartesian() {
 }
 
 GLfloat randNumber( int max ) {
-	return rand() / (GLfloat)RAND_MAX * max * 2.0 - max;
+	//return rand() / (GLfloat)RAND_MAX * max * 2.0 - max;
+	return rand()%((max - 3) + 1) + 3;
 }
 
 // loadAndRegisterTexture() ////////////////////////////////////////////////////
@@ -722,9 +728,15 @@ void setupBuffers() {
 ////////////////////////////////////////////////////////////////////////////////
 void setupSnowBuffers() {
 	// LOOKHERE #2
+	float nAngle = (2*M_PI) / NUM_POINTS;
+	float xzAngle = nAngle;
 	for( int i = 0; i < NUM_POINTS; i++ ) {
-		Vertex v = { randNumber(5), randNumber(5), randNumber(5) };
+		Vertex v = { spawn.x, spawn.y, spawn.z };
 		points[i] = v;
+		float vs = randNumber(5);
+		glm::vec3 speed = glm::vec3(vs*cos(xzAngle), vs*sin(angle), vs*sin(xzAngle));
+		part[i] = Particle(spawn, speed, 1.0); // life volocity position
+		xzAngle += nAngle;
 	}
 
 	glGenVertexArrays( 1, &pointsVAO );
@@ -865,7 +877,7 @@ void renderSnowScene( glm::mat4 viewMtx, glm::mat4 projMtx ) {
 	int orderedInd[NUM_POINTS];
 	double distances[NUM_POINTS];
 	for (int i = 0; i < NUM_POINTS; ++i) {
-		glm::vec4 p = glm::vec4(points[i].x, points[i].y, points[i].z, 1) * modelMtx;
+		glm::vec4 p = glm::vec4(part[i].position.x, part[i].position.y, part[i].position.z, 1) * modelMtx;
 		glm::vec4 ep = p - glm::vec4(eyePoint, 1);
 		
 		distances[i] = glm::dot(glm::vec4(vVec, 0), ep);
@@ -888,7 +900,8 @@ void renderSnowScene( glm::mat4 viewMtx, glm::mat4 projMtx ) {
 	
 	Vertex orderedPoints[NUM_POINTS];
 	for( unsigned int i = 0; i < NUM_POINTS; ++i) {
-		orderedPoints[i] = points[ orderedInd[i] ];
+		orderedPoints[i] = { part[ orderedInd[i] ].position.x, part[ orderedInd[i] ].position.y, part[ orderedInd[i] ].position.z };
+		part[ orderedInd[i] ].update();
 	}
 	
 	glBindVertexArray( pointsVAO );
@@ -902,6 +915,9 @@ void renderSnowScene( glm::mat4 viewMtx, glm::mat4 projMtx ) {
 	// LOOKHERE #4
 	glBindTexture( GL_TEXTURE_2D, textureHandle );
 	glDrawArrays( GL_POINTS, 0, NUM_POINTS );
+	
+	// This will be the time for the snowflakes dieing so we make
+	if (part[0].currentAge >= part[0].maxLife) setupSnowBuffers();
 }
 
 ///*****************************************************************************
