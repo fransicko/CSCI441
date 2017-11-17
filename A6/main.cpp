@@ -96,7 +96,7 @@ CSCI441::ShaderProgram *snowShaderProgram = NULL;
 GLint snow_modelview_uniform_location, snow_projection_uniform_location;
 GLint snow_vpos_attrib_location;
 
-const int NUM_POINTS = 20;
+const int NUM_POINTS = 3;
 struct Vertex { GLfloat x, y, z; };
 Vertex points[NUM_POINTS];
 Particle part[NUM_POINTS];
@@ -733,7 +733,7 @@ void setupSnowBuffers() {
 	for( int i = 0; i < NUM_POINTS; i++ ) {
 		Vertex v = { spawn.x, spawn.y, spawn.z };
 		points[i] = v;
-		float vs = randNumber(5);
+		float vs = randNumber(5);	
 		glm::vec3 speed = glm::vec3(vs*cos(xzAngle), vs*sin(angle), vs*sin(xzAngle));
 		part[i] = Particle(spawn, speed, 1.0); // life volocity position
 		xzAngle += nAngle;
@@ -748,6 +748,7 @@ void setupSnowBuffers() {
 	glEnableVertexAttribArray( snow_vpos_attrib_location );
 	glVertexAttribPointer( snow_vpos_attrib_location, 3, GL_FLOAT, GL_FALSE, 0, (void*)0 );
 }
+
 //******************************************************************************
 //
 // Rendering / Drawing Functions - this is where the magic happens!
