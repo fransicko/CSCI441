@@ -18,19 +18,20 @@ Particle::Particle() {
 Particle::Particle( glm::vec3 p, glm::vec3 v, double ml ) : maxLife(ml), velocity(v), position(p) {
 	currentAge = 0;
 	size = 1;
+	positionI = p;
 }
 
-void Particle::update() {
+void Particle::update(double time) {
 	// We wil update the x and z direction using the same method
 	// x
 	
 	float yV = velocity.y - 9.81*currentAge;
 	
-	float xPos = velocity.x * currentAge;
-	float zPos = velocity.z * currentAge;
-	float yPos = velocity.y * currentAge - (0.5)*9.81*(currentAge*currentAge);
+	float xPos = positionI.x + velocity.x * currentAge;
+	float zPos = positionI.z + velocity.z * currentAge;
+	float yPos = positionI.y + yV * currentAge - (0.5f)*9.81*(currentAge*currentAge);
     
 	position = glm::vec3(xPos, yPos, zPos);
-	currentAge += 0.0025;
+	currentAge += time;
 }
 

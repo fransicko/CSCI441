@@ -58,6 +58,7 @@ int objectIndex = 2;
 glm::vec3 spawn( 0.0f,  2.0f,  0.0f ); // TODO #A6 This will need to change later
 float angle = M_PI / 2;
 CSCI441::ModelLoader* model = NULL;
+double timeI;
 
 GLuint shaderProgramHandle = 0;
 GLint mvp_uniform_location = -1, time_uniform_location = -1;
@@ -900,9 +901,12 @@ void renderSnowScene( glm::mat4 viewMtx, glm::mat4 projMtx ) {
 	}
 	
 	Vertex orderedPoints[NUM_POINTS];
+	double endTime = glfwGetTime();
+	double timeD = endTime - timeI;
+	timeI = endTime;
 	for( unsigned int i = 0; i < NUM_POINTS; ++i) {
 		orderedPoints[i] = { part[ orderedInd[i] ].position.x, part[ orderedInd[i] ].position.y, part[ orderedInd[i] ].position.z };
-		part[ orderedInd[i] ].update();
+		part[ orderedInd[i] ].update(timeD);
 	}
 	
 	glBindVertexArray( pointsVAO );
@@ -944,6 +948,7 @@ int main( int argc, char *argv[] ) {
 	// Need to read in a file
   // GLFW sets up our OpenGL context so must be done first
 	GLFWwindow *window = setupGLFW();	// initialize all of the GLFW specific information releated to OpenGL and our window
+	timeI = glfwGetTime();
 	setupOpenGL();										// initialize all of the OpenGL specific information
 	// LOOKHERE #1A
 	setupGLEW();											// initialize all of the GLEW specific information

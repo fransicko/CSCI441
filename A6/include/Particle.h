@@ -16,9 +16,10 @@ public:
   double currentAge;
   float size;
   glm::vec3 position;
+  glm::vec3 positionI;
   glm::vec3 velocity; // This will contain the veleocty going in the three directions
   
-  void update();
+  void update(double time);
 
 
 private:
