@@ -14,6 +14,7 @@ layout(triangle_strip, max_vertices = 4) out;
 
 
 uniform mat4 projMatrix;
+uniform float size;
 
 // TODO I: add varying output
 out vec2 geoShader;

@@ -97,6 +97,8 @@ CSCI441::ShaderProgram *snowShaderProgram = NULL;
 GLint snow_modelview_uniform_location, snow_projection_uniform_location;
 GLint snow_vpos_attrib_location;
 
+GLint snow_size = -1;
+
 const int NUM_POINTS = 3;
 struct Vertex { GLfloat x, y, z; };
 Vertex points[NUM_POINTS];
@@ -434,6 +436,7 @@ void setupSnowShaders() {
 	snow_modelview_uniform_location  = snowShaderProgram->getUniformLocation( "mvMatrix" );
 	snow_projection_uniform_location = snowShaderProgram->getUniformLocation( "projMatrix" );
 	snow_vpos_attrib_location			  = snowShaderProgram->getAttributeLocation( "vPos" );
+	snow_size = snowShaderProgram->getUniformLocation( "size" );
 }
 
 // setupTextures() /////////////////////////////////////////////////////////////
@@ -875,6 +878,8 @@ void renderSnowScene( glm::mat4 viewMtx, glm::mat4 projMtx ) {
 	// TODO #1 : sort!
 	glm::vec3 vVec = lookAtPoint - eyePoint;
     glm::normalize(vVec);
+	
+	glUniform1f(snow_size, 5.0f);
 	
 	int orderedInd[NUM_POINTS];
 	double distances[NUM_POINTS];
