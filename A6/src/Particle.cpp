@@ -35,3 +35,19 @@ void Particle::update(double time) {
 	currentAge += time;
 }
 
+void Particle::draw(GLint &snow_size, GLuint &pointsVAO, GLuint &pointsVBO, GLuint textureHandle) {
+	std::cout << "\n Its in the draw for particle" << std::endl;
+	
+	point[0] = { position.x, position.y, position.z };
+	glUniform1f(snow_size, 1.0f - (float)(currentAge / maxLife));
+	glBindVertexArray( pointsVAO );
+	
+	// TODO #2 : send our sorted data
+	glBindBuffer(GL_ARRAY_BUFFER, pointsVBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(point), point);
+
+	// LOOKHERE #4
+	glBindTexture( GL_TEXTURE_2D, textureHandle );
+	glDrawArrays( GL_POINTS, 0, 1 );
+}
+

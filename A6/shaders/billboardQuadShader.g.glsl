@@ -25,7 +25,7 @@ void main() {
     //********* Vertex Calculations  **********
     //*****************************************
     // TODO #C: add first point
-	gl_Position = projMatrix * (gl_in[0].gl_Position + vec4(-1, -1, 0, 1));
+	gl_Position = projMatrix * (gl_in[0].gl_Position + vec4(-1*size, -1*size, 0, 1));
 	geoShader = vec2(0,0);
     
     
@@ -35,21 +35,21 @@ void main() {
     
     
     // TODO #F: add 2nd point
-	gl_Position = projMatrix * (gl_in[0].gl_Position + vec4(1, -1, 0, 1));
+	gl_Position = projMatrix * (gl_in[0].gl_Position + vec4(1*size, -1*size, 0, 1));
 	geoShader = vec2(1, 0);
 	EmitVertex();
     
     
     
     // TODO #G: add 3rd point
-	gl_Position = projMatrix * (gl_in[0].gl_Position + vec4(-1, 1, 0, 1));
+	gl_Position = projMatrix * (gl_in[0].gl_Position + vec4(-1*size, 1*size, 0, 1));
 	geoShader = vec2(0, 1);
 	EmitVertex();
     
     
     
     // TODO #H: add 4th point
-	gl_Position = projMatrix * (gl_in[0].gl_Position + vec4(1, 1, 0, 1));
+	gl_Position = projMatrix * (gl_in[0].gl_Position + vec4(1*size, 1*size, 0, 1));
 	geoShader = vec2(1, 1);
 	EmitVertex();
     

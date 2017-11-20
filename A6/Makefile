@@ -22,7 +22,7 @@
 ########################################
 
 TARGET = a6
-OBJECTS = main.o src/Particle.o
+OBJECTS = main.o src/Particle.o src/ParticleSystem.o
 
 LOCAL_INC_PATH = C:\Users\michael\CSCI441\include
 LOCAL_LIB_PATH = C:\Users\michael\CSCI441\lib

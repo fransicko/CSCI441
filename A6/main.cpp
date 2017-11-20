@@ -25,6 +25,9 @@
 #include <stdio.h>				// for printf functionality
 #include <stdlib.h>				// for exit functionality
 #include <time.h>					// for time functionality
+#include <fstream>
+#include <iostream>
+#include <sstream>
 
 // note that all of these headers end in *3.hpp
 // these class library files will only work with OpenGL 3.0+
@@ -36,7 +39,9 @@
 
 #include "include/Shader_Utils.h"   // our shader helper functions
 #include "include/Particle.h"
+#include "include/ParticleSystem.h"
 
+using namespace std;
 //*************************************************************************************
 //
 // Global Parameters
@@ -51,12 +56,14 @@ glm::vec3 cameraAngles( 1.82f, 2.01f, 15.0f );
 glm::vec3 eyePoint(   10.0f, 10.0f, 10.0f );
 glm::vec3 lookAtPoint( 0.0f,  0.0f,  0.0f );
 glm::vec3 upVector(    0.0f,  1.0f,  0.0f );
+glm::vec3 location(0.0f,0.0f,0.0f);
 
 int objectIndex = 2;
 
 // A6 globals for spawn location, angle of launch
 glm::vec3 spawn( 0.0f,  2.0f,  0.0f ); // TODO #A6 This will need to change later
 float angle = M_PI / 2;
+float rotate = 0.0f;
 CSCI441::ModelLoader* model = NULL;
 double timeI;
 
@@ -99,10 +106,11 @@ GLint snow_vpos_attrib_location;
 
 GLint snow_size = -1;
 
-const int NUM_POINTS = 3;
+//const int NUM_POINTS = 3;
 struct Vertex { GLfloat x, y, z; };
-Vertex points[NUM_POINTS];
-Particle part[NUM_POINTS];
+//vector<Vertex> points;
+//Particle part[NUM_POINTS];
+ParticleSystem ps;
 GLuint pointsVAO, pointsVBO;
 
 GLuint textureHandle;
@@ -124,9 +132,9 @@ void convertSphericalToCartesian() {
 	eyePoint.z = cameraAngles.z * -cosf( cameraAngles.x ) * sinf( cameraAngles.y );
 }
 
-GLfloat randNumber( int max ) {
+GLint randNumber( int max, int min ) {
 	//return rand() / (GLfloat)RAND_MAX * max * 2.0 - max;
-	return rand()%((max - 3) + 1) + 3;
+	return rand()%((max - min) + 1) + min;
 }
 
 // loadAndRegisterTexture() ////////////////////////////////////////////////////
@@ -180,14 +188,20 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	if ((key == GLFW_KEY_ESCAPE || key == 'Q') && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 
-  if( action == GLFW_PRESS ) {
+  if( action == GLFW_PRESS && action == GLFW_REPEAT ) {
     switch( key ) {
       case GLFW_KEY_ESCAPE:
       case GLFW_KEY_Q:
-        glfwSetWindowShouldClose( window, GLFW_TRUE );
+		glfwSetWindowShouldClose( window, GLFW_TRUE );
         break;
 
-      case GLFW_KEY_1:
+      case GLFW_KEY_W:
+		location += glm::vec3(0.15f * sin(rotate), 0, 0.15f * cos(rotate));
+		if (location.x > 10.0) location.x = 10.0;
+		if (location.x < -10.0)location.x = -10.0;
+		if (location.z > 10.0) location.z = 10.0;
+		if (location.z < -10.0) location.z = -10.0;
+		break;
       case GLFW_KEY_2:
       case GLFW_KEY_3:
       case GLFW_KEY_4:
@@ -437,6 +451,57 @@ void setupSnowShaders() {
 	snow_projection_uniform_location = snowShaderProgram->getUniformLocation( "projMatrix" );
 	snow_vpos_attrib_location			  = snowShaderProgram->getAttributeLocation( "vPos" );
 	snow_size = snowShaderProgram->getUniformLocation( "size" );
+}
+
+void fillSystem(const char *fileName) {
+	std::ifstream fileI;
+	std::string line1;
+	fileI.open(fileName);
+	/*std::getline(fileI, line1); // Have to treat this as a csv
+	
+	std::istringstream ss(line1);
+	std::string check;
+	std::getline(ss, check, ',');
+	
+	if (check != "F") {
+		fprintf( stderr, "The only Acceptable Particle System is fountain." );
+		exit(EXIT_FAILURE);
+	}
+	*/
+	while(std::getline(fileI, line1)) {
+		stringstream ss(line1);
+		char sys;
+		float stuff;
+		vector<float> param; // the parameters
+		
+		ss >> sys; // We have to go number by number
+		if (sys == 'F') {
+			ss >> sys; // move over the comman
+			while(ss >> stuff) {
+				param.push_back(stuff);
+				if (ss.peek() == ',' || ss.peek() == ' ') ss.ignore();
+				
+				
+			}
+			
+			if (param.size() != 9) {
+				fprintf( stderr, "The file does not have all the needed inputs");
+				std::cout << param.size() << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			
+			ps = ParticleSystem('F', glm::vec3(param.at(0), param.at(1), param.at(2)),
+			(double)param.at(3), param.at(4), param.at(5), 
+			param.at(6), param.at(7), (int)param.at(8), timeI);
+		}
+		else {
+			fprintf( stderr, "The only Acceptable Particle System is fountain." );
+			exit(EXIT_FAILURE);
+		}
+		
+	}
+	fileI.close();
+	
 }
 
 // setupTextures() /////////////////////////////////////////////////////////////
@@ -732,16 +797,23 @@ void setupBuffers() {
 ////////////////////////////////////////////////////////////////////////////////
 void setupSnowBuffers() {
 	// LOOKHERE #2
+	//points.clear();
+	/*
 	float nAngle = (2*M_PI) / NUM_POINTS;
 	float xzAngle = nAngle;
-	for( int i = 0; i < NUM_POINTS; i++ ) {
-		Vertex v = { spawn.x, spawn.y, spawn.z };
+	*/
+	Vertex points[ps.num_part];
+	for( int i = 0; i < ps.num_part; i++ ) {
+		Vertex v = { ps.emitter.x, ps.emitter.y, ps.emitter.z };
 		points[i] = v;
-		float vs = randNumber(5);	
-		glm::vec3 speed = glm::vec3(vs*cos(xzAngle), vs*sin(angle), vs*sin(xzAngle));
-		part[i] = Particle(spawn, speed, 1.0); // life volocity position
+		/*
+		float vs = randNumber(ps.maxVol, ps.minVol);	
+		glm::vec3 speed = glm::vec3(vs*cos(xzAngle), vs*sin(angle * M_PI / 180.0f), vs*sin(xzAngle));
+		ps.part.push_back(Particle(ps.emitter, speed, randNumber(ps.maxLife, ps.minLife))); // life volocity position
 		xzAngle += nAngle;
+		*/
 	}
+	ps.update();
 
 	glGenVertexArrays( 1, &pointsVAO );
 	glBindVertexArray( pointsVAO );
@@ -779,20 +851,6 @@ void renderScene( glm::mat4 viewMtx, glm::mat4 projMtx ) {
   // send time to GPU
 	// TODO #10B
   glUniform1f(time_uniform_location, glfwGetTime());
-
-  // draw all the cool stuff!
-  
-  /*
-  switch( objectIndex ) {
-    case 0: CSCI441::drawSolidTeapot( 2.0 );                            break;
-    case 1: CSCI441::drawSolidCube( 4.0 );                              break;
-    case 2: CSCI441::drawSolidSphere( 3.0, 16, 16 );                    break;
-    case 3: CSCI441::drawSolidTorus( 1.0, 2.0, 16, 16 );                break;
-    case 4: CSCI441::drawSolidCone( 2.0, 4.0, 16, 16 );                 break;
-    case 5: CSCI441::drawSolidCylinder( 2.0, 2.0, 4.0, 16, 16 );        break;
-    case 6: model->draw( vpos_attrib_location );                        break;
-  }
-  */
   
   // Draw the skybox
 	//glEnable(GL_TEXTURE);
@@ -832,7 +890,10 @@ void renderScene( glm::mat4 viewMtx, glm::mat4 projMtx ) {
   glUseProgram(objectProgramHandle);
 
   // precompute our MVP CPU side so it only needs to be computed once
-  glm::mat4 obj_mvpMtx = projMtx * viewMtx * modelMtx;
+  glm::mat4 objModelMtx = glm::translate(modelMtx, location);
+  objModelMtx = glm::rotate(objModelMtx, rotate, glm::vec3(0,1,0));
+  
+  glm::mat4 obj_mvpMtx = projMtx * viewMtx * objModelMtx;
   // send MVP to GPU
 	// TODO #9B
 	glUniformMatrix4fv(obj_mvp_uniform_location, 1, GL_FALSE, &obj_mvpMtx[0][0]);
@@ -849,12 +910,9 @@ void renderScene( glm::mat4 viewMtx, glm::mat4 projMtx ) {
 	glUniform3f(lightSpec, 1.0f, 1.0f, 1.0f);
 	
 	glUniform3f(lightPos, 10.0f, 10.0f, 10.0f);
-	glUniform3f(camPos, eyePoint.x, eyePoint.y, eyePoint.z);
+	glUniform3f(camPos, location.x + eyePoint.x, location.y + eyePoint.y, location.z + eyePoint.z);
 	
-  //model->draw( obj_vpos_attrib_location, normalHandle );
-  
-  
-  model->draw(obj_vpos_attrib_location, normalHandle, obj_text_coor_location, matDiff, matSpec, shine, matAmb);
+	model->draw(obj_vpos_attrib_location, normalHandle, obj_text_coor_location, matDiff, matSpec, shine, matAmb);
 	
 	
 	
@@ -876,23 +934,24 @@ void renderSnowScene( glm::mat4 viewMtx, glm::mat4 projMtx ) {
   glUniformMatrix4fv(snow_projection_uniform_location, 1, GL_FALSE, &projMtx[0][0]);
 
 	// TODO #1 : sort!
+	
 	glm::vec3 vVec = lookAtPoint - eyePoint;
     glm::normalize(vVec);
 	
 	glUniform1f(snow_size, 5.0f);
 	
-	int orderedInd[NUM_POINTS];
-	double distances[NUM_POINTS];
-	for (int i = 0; i < NUM_POINTS; ++i) {
-		glm::vec4 p = glm::vec4(part[i].position.x, part[i].position.y, part[i].position.z, 1) * modelMtx;
+	int orderedInd[ps.num_part];
+	double distances[ps.num_part];
+	for (int i = 0; i < ps.num_part; ++i) {
+		glm::vec4 p = glm::vec4(ps.part.at(i).position.x, ps.part.at(i).position.y, ps.part.at(i).position.z, 1) * modelMtx;
 		glm::vec4 ep = p - glm::vec4(eyePoint, 1);
 		
 		distances[i] = glm::dot(glm::vec4(vVec, 0), ep);
 		orderedInd[i] = i;
 	}
 	
-	for (unsigned int i = 0; i < NUM_POINTS; ++i) {
-		for (unsigned int j = i+1; j < NUM_POINTS; ++j) {
+	for (int i = 0; i < ps.num_part; ++i) {
+		for (int j = i+1; j < ps.num_part; ++j) {
 			if (distances[i] < distances[j]) {
 				double c = distances[j];
 				distances[j] = distances[i];
@@ -905,15 +964,20 @@ void renderSnowScene( glm::mat4 viewMtx, glm::mat4 projMtx ) {
 		}
 	}
 	
-	Vertex orderedPoints[NUM_POINTS];
+	
+	Vertex orderedPoints[ps.num_part];
 	double endTime = glfwGetTime();
 	double timeD = endTime - timeI;
 	timeI = endTime;
-	for( unsigned int i = 0; i < NUM_POINTS; ++i) {
-		orderedPoints[i] = { part[ orderedInd[i] ].position.x, part[ orderedInd[i] ].position.y, part[ orderedInd[i] ].position.z };
-		part[ orderedInd[i] ].update(timeD);
+	for(int i = 0; i < ps.num_part; ++i) {
+		orderedPoints[i] = { ps.part.at( orderedInd[i] ).position.x, ps.part.at( orderedInd[i] ).position.y, ps.part.at( orderedInd[i] ).position.z };
+		ps.part.at( orderedInd[i] ).update(timeD);
 	}
 	
+	
+	
+	// update the size of the snowflake
+	glUniform1f(snow_size, 1.0f - (float)(ps.part.at(0).currentAge / ps.part.at(0).maxLife));
 	glBindVertexArray( pointsVAO );
 	
 	// TODO #2 : send our sorted data
@@ -924,10 +988,16 @@ void renderSnowScene( glm::mat4 viewMtx, glm::mat4 projMtx ) {
 
 	// LOOKHERE #4
 	glBindTexture( GL_TEXTURE_2D, textureHandle );
-	glDrawArrays( GL_POINTS, 0, NUM_POINTS );
+	glDrawArrays( GL_POINTS, 0, ps.num_part );
 	
 	// This will be the time for the snowflakes dieing so we make
-	if (part[0].currentAge >= part[0].maxLife) setupSnowBuffers();
+	if (ps.part.at(0).currentAge >= ps.part.at(0).maxLife) setupSnowBuffers();
+	
+	/*
+	double endTime = glfwGetTime();
+	// draw our particale system and draw the particles
+	ps.draw(eyePoint, lookAtPoint, snow_size, endTime, pointsVAO, pointsVBO);
+	*/
 }
 
 ///*****************************************************************************
@@ -941,14 +1011,21 @@ void renderSnowScene( glm::mat4 viewMtx, glm::mat4 projMtx ) {
 ////////////////////////////////////////////////////////////////////////////////
 int main( int argc, char *argv[] ) {
   // ensure proper number of arguments provided at runtime
-  /*
+  
 	if( argc != 2 ) {
     // we need a vertex and fragment shader
-		fprintf( stderr, "Usage: ./a5 <file.obj>\n" );
+		fprintf( stderr, "Usage: ./a6 <controlFile.txt>\n" );
 		exit(EXIT_FAILURE);
 	}
 	
-	*/
+	std::string f = argv[1];
+	// check if its right
+	if(f.substr(f.length() - 3) != "txt") {
+		fprintf( stderr, "Usage: ./a6 <controlFile.txt>\n" );
+		exit(EXIT_FAILURE);
+	}
+	
+	fillSystem( argv[1] );
 	
 	// Need to read in a file
   // GLFW sets up our OpenGL context so must be done first
@@ -965,7 +1042,7 @@ int main( int argc, char *argv[] ) {
 	setupObject( "models/suzanne.obj" );
 	setupBuffers();										// load all our VAOs and VBOs into memory
 	setupSnowShaders(); 									// load our shader program into memory
-	setupSnowBuffers();										// load all our VAOs and VBOs into memory
+	ps.update();//setupSnowBuffers();										// load all our VAOs and VBOs into memory
 	
 	setupTextures();
 	
