@@ -1,10 +1,11 @@
 var indexSectionsWithContent =
 {
-  0: "cdopt",
-  1: "o",
-  2: "c",
-  3: "ot",
-  4: "dp"
+  0: "cdefglmopstu~",
+  1: "ms",
+  2: "cfot",
+  3: "fmost",
+  4: "deglmpsu~",
+  5: "d"
 };
 
 var indexSectionNames =
@@ -13,7 +14,8 @@ var indexSectionNames =
   1: "classes",
   2: "namespaces",
   3: "files",
-  4: "functions"
+  4: "functions",
+  5: "pages"
 };
 
 var indexSectionLabels =
@@ -22,6 +24,7 @@ var indexSectionLabels =
   1: "Classes",
   2: "Namespaces",
   3: "Files",
-  4: "Functions"
+  4: "Functions",
+  5: "Pages"
 };
 

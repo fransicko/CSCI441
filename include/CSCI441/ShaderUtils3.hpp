@@ -162,11 +162,10 @@ void CSCI441_INTERNAL::ShaderUtils::printLog( GLuint handle ) {
 }
 
 void CSCI441_INTERNAL::ShaderUtils::printSubroutineInfo( GLuint handle, GLenum shaderStage ) {
-	int params = 0, params2 = 0;
+	int params, params2;
 	int *params3 = NULL;
 
 	glGetProgramStageiv(handle, shaderStage, GL_ACTIVE_SUBROUTINE_UNIFORMS, &params);
-
 	printf("[INFO]: | GL_ACTIVE_SUBROUTINE_UNIFORMS (%-15s): %5i |\n", CSCI441_INTERNAL::ShaderUtils::GL_shader_type_to_string(shaderStage), params);
 	for(int i = 0; i < params; i++ ) {
 		char name[64];

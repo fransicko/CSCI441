@@ -991,7 +991,7 @@ void renderSnowScene( glm::mat4 viewMtx, glm::mat4 projMtx ) {
 	glDrawArrays( GL_POINTS, 0, ps.num_part );
 	
 	// This will be the time for the snowflakes dieing so we make
-	if (ps.part.at(0).currentAge >= ps.part.at(0).maxLife) setupSnowBuffers();
+	setupSnowBuffers();
 	
 	/*
 	double endTime = glfwGetTime();

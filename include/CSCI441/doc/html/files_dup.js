@@ -1,6 +1,4 @@
 var files_dup =
 [
-    [ "objects.hpp", "objects_8hpp.html", "objects_8hpp" ],
-    [ "OpenGLUtils.hpp", "_open_g_l_utils_8hpp.html", "_open_g_l_utils_8hpp" ],
-    [ "teapot.hpp", "teapot_8hpp.html", null ]
+    [ "CSCI441", "dir_00b3eae77e1f3012f8d6fd053c504834.html", "dir_00b3eae77e1f3012f8d6fd053c504834" ]
 ];

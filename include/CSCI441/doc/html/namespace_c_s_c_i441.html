@@ -30,9 +30,9 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">CSCI441 Library
-   &#160;<span id="projectnumber">v1.1</span>
+   &#160;<span id="projectnumber">v1.7</span>
    </div>
-   <div id="projectbrief">Helper functions for CSCI441</div>
+   <div id="projectbrief">Helper functions for CSCI441 Computer Graphics</div>
   </td>
  </tr>
  </tbody>
@@ -100,8 +100,11 @@ $(document).ready(function(){initNavTree('namespace_c_s_c_i441.html','');});
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_s_c_i441_1_1_open_g_l_utils.html">OpenGLUtils</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">static class containing OpenGL Utilities  <a href="class_c_s_c_i441_1_1_open_g_l_utils.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_s_c_i441_1_1_model_loader.html">ModelLoader</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loads object models from file and renders using VBOs/VAOs.  <a href="class_c_s_c_i441_1_1_model_loader.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_s_c_i441_1_1_shader_program.html">ShaderProgram</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handles registration and compilation of Shaders.  <a href="class_c_s_c_i441_1_1_shader_program.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -160,10 +163,84 @@ Functions</h2></td></tr>
 <tr class="memitem:ae423b2406df96b1cafe485245e4f9203"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_c_s_c_i441.html#ae423b2406df96b1cafe485245e4f9203">popMatrix</a> (glm::mat4 mtx)</td></tr>
 <tr class="memdesc:ae423b2406df96b1cafe485245e4f9203"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multiplies current matrix by inverse of given matrix.  <a href="#ae423b2406df96b1cafe485245e4f9203">More...</a><br /></td></tr>
 <tr class="separator:ae423b2406df96b1cafe485245e4f9203"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac201d649430f0c55e57db10b0dddd100"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_c_s_c_i441.html#ac201d649430f0c55e57db10b0dddd100">setMaterial</a> (MaterialStruct material)</td></tr>
+<tr class="memdesc:ac201d649430f0c55e57db10b0dddd100"><td class="mdescLeft">&#160;</td><td class="mdescRight">sets all material properties at once  <a href="#ac201d649430f0c55e57db10b0dddd100">More...</a><br /></td></tr>
+<tr class="separator:ac201d649430f0c55e57db10b0dddd100"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4330a78bc3618a59f4c9a14db9d3e48a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_c_s_c_i441.html#a4330a78bc3618a59f4c9a14db9d3e48a">setVertexAttributeLocations</a> (GLint positionLocation, GLint normalLocation=-1, GLint texCoordLocation=-1)</td></tr>
+<tr class="memdesc:a4330a78bc3618a59f4c9a14db9d3e48a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the attribute locations for vertex positions, normals, and texture coordinates.  <a href="#a4330a78bc3618a59f4c9a14db9d3e48a">More...</a><br /></td></tr>
+<tr class="separator:a4330a78bc3618a59f4c9a14db9d3e48a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a497b04f17c79e094cc4cce87cdf58262"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_c_s_c_i441.html#a497b04f17c79e094cc4cce87cdf58262">DEPRECATED</a> (void <a class="el" href="namespace_c_s_c_i441.html#aa818e8189c42c50e88d6d0512274bcfb">pushMatrix</a>(glm::mat4 mtx))</td></tr>
+<tr class="memdesc:a497b04f17c79e094cc4cce87cdf58262"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multiplies current matrix by given matrix.  <a href="#a497b04f17c79e094cc4cce87cdf58262">More...</a><br /></td></tr>
+<tr class="separator:a497b04f17c79e094cc4cce87cdf58262"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b02a3d2b9323127b811be893d7a63e1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_c_s_c_i441.html#a1b02a3d2b9323127b811be893d7a63e1">DEPRECATED</a> (void <a class="el" href="namespace_c_s_c_i441.html#ac201d649430f0c55e57db10b0dddd100">setMaterial</a>(MaterialStruct material))</td></tr>
+<tr class="memdesc:a1b02a3d2b9323127b811be893d7a63e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">sets all material properties at once  <a href="#a1b02a3d2b9323127b811be893d7a63e1">More...</a><br /></td></tr>
+<tr class="separator:a1b02a3d2b9323127b811be893d7a63e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="namespace_c_s_c_i441.html" title="CSCI441 Helper Functions for OpenGL. ">CSCI441</a> Helper Functions for OpenGL. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="a497b04f17c79e094cc4cce87cdf58262"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a497b04f17c79e094cc4cce87cdf58262">&#9670;&nbsp;</a></span>DEPRECATED() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">CSCI441::DEPRECATED </td>
+          <td>(</td>
+          <td class="paramtype">void &#160;</td>
+          <td class="paramname"><em>pushMatrix</em>glm::mat4 mtx</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Multiplies current matrix by given matrix. </p>
+<p>Multiplies current matrix by inverse of given matrix.</p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000001">Deprecated:</a></b></dt><dd>Multiplies current matrix by given matrix </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">glm::mat4</td><td>mtx - matrix to multiply the current matrix by</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000002">Deprecated:</a></b></dt><dd>Multiplies current matrix by inverse of given matrix </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">glm::mat4</td><td>mtx - matrix to multiply the current matrix by the inverse of </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a1b02a3d2b9323127b811be893d7a63e1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b02a3d2b9323127b811be893d7a63e1">&#9670;&nbsp;</a></span>DEPRECATED() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">CSCI441::DEPRECATED </td>
+          <td>(</td>
+          <td class="paramtype">void &#160;</td>
+          <td class="paramname"><em>setMaterial</em>MaterialStruct material</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>sets all material properties at once </p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000003">Deprecated:</a></b></dt><dd>Multiplies current matrix by given matrix Sets the diffuse, ambient, specular, and shininess properties at once</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">MaterialStruct</td><td>material - the material to set the properties for </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a484e60eb6fb39efef552b7838ca35164"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a484e60eb6fb39efef552b7838ca35164">&#9670;&nbsp;</a></span>drawSolidCone()</h2>
 
@@ -398,7 +475,7 @@ slices must be greater than two </dd></dl>
   </table>
   </dd>
 </dl>
-<dl class="section pre"><dt>Precondition</dt><dd>inner is greater than zero </dd>
+<dl class="section pre"><dt>Precondition</dt><dd>inner is greater than or equal to zero </dd>
 <dd>
 outer is greater than zero </dd>
 <dd>
@@ -481,7 +558,7 @@ rings is greater than zero </dd></dl>
   </table>
   </dd>
 </dl>
-<dl class="section pre"><dt>Precondition</dt><dd>inner is greater than zero </dd>
+<dl class="section pre"><dt>Precondition</dt><dd>inner is greater than or equal to zero </dd>
 <dd>
 outer is greater than zero </dd>
 <dd>
@@ -892,7 +969,7 @@ slices must be greater than two </dd></dl>
   </table>
   </dd>
 </dl>
-<dl class="section pre"><dt>Precondition</dt><dd>inner is greater than zero </dd>
+<dl class="section pre"><dt>Precondition</dt><dd>inner is greater than or equal to zero </dd>
 <dd>
 outer is greater than zero </dd>
 <dd>
@@ -975,7 +1052,7 @@ rings is greater than zero </dd></dl>
   </table>
   </dd>
 </dl>
-<dl class="section pre"><dt>Precondition</dt><dd>inner is greater than zero </dd>
+<dl class="section pre"><dt>Precondition</dt><dd>inner is greater than or equal to zero </dd>
 <dd>
 outer is greater than zero </dd>
 <dd>
@@ -1214,6 +1291,94 @@ rings must be greater than two </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">glm::mat4</td><td>mtx - matrix to multiply the current matrix by </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ac201d649430f0c55e57db10b0dddd100"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac201d649430f0c55e57db10b0dddd100">&#9670;&nbsp;</a></span>setMaterial()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CSCI441::setMaterial </td>
+          <td>(</td>
+          <td class="paramtype">MaterialStruct&#160;</td>
+          <td class="paramname"><em>material</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>sets all material properties at once </p>
+<p>Sets the diffuse, ambient, specular, and shininess properties at once</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">MaterialStruct</td><td>material - the material to set the properties for </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a4330a78bc3618a59f4c9a14db9d3e48a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4330a78bc3618a59f4c9a14db9d3e48a">&#9670;&nbsp;</a></span>setVertexAttributeLocations()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CSCI441::setVertexAttributeLocations </td>
+          <td>(</td>
+          <td class="paramtype">GLint&#160;</td>
+          <td class="paramname"><em>positionLocation</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">GLint&#160;</td>
+          <td class="paramname"><em>normalLocation</em> = <code>-1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">GLint&#160;</td>
+          <td class="paramname"><em>texCoordLocation</em> = <code>-1</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets the attribute locations for vertex positions, normals, and texture coordinates. </p>
+<p>Needs to be called after a shader program is being used and before drawing geometry</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">GLint</td><td>positionLocation - location of the vertex position attribute </td></tr>
+    <tr><td class="paramname">GLint</td><td>normalLocation - location of the vertex normal attribute </td></tr>
+    <tr><td class="paramname">GLint</td><td>texCoordLocation - location of the vertex texture coordinate attribute </td></tr>
   </table>
   </dd>
 </dl>

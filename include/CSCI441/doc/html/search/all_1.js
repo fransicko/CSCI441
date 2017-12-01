@@ -1,5 +1,9 @@
 var searchData=
 [
+  ['deprecated',['DEPRECATED',['../namespace_c_s_c_i441.html#a497b04f17c79e094cc4cce87cdf58262',1,'CSCI441::DEPRECATED(void pushMatrix(glm::mat4 mtx))'],['../namespace_c_s_c_i441.html#a1b02a3d2b9323127b811be893d7a63e1',1,'CSCI441::DEPRECATED(void setMaterial(MaterialStruct material))'],['../deprecated.html',1,'(Global Namespace)']]],
+  ['disableautogeneratenormals',['disableAutoGenerateNormals',['../class_c_s_c_i441_1_1_model_loader.html#aaf1ec38a0f551569ccf1a47af2a561f3',1,'CSCI441::ModelLoader']]],
+  ['disabledebugmessages',['disableDebugMessages',['../class_c_s_c_i441_1_1_shader_program.html#a9358a3f05e8432707d8ec89d1cd9d248',1,'CSCI441::ShaderProgram']]],
+  ['draw',['draw',['../class_c_s_c_i441_1_1_model_loader.html#a46734dcf7845e240a1ca9a31d6e5a468',1,'CSCI441::ModelLoader']]],
   ['drawsolidcone',['drawSolidCone',['../namespace_c_s_c_i441.html#a484e60eb6fb39efef552b7838ca35164',1,'CSCI441']]],
   ['drawsolidcube',['drawSolidCube',['../namespace_c_s_c_i441.html#a6ae4602d63b3a3313b6156a12ef4d066',1,'CSCI441']]],
   ['drawsolidcylinder',['drawSolidCylinder',['../namespace_c_s_c_i441.html#ae5fbc355c04fd762dcdda56a1954e2c6',1,'CSCI441']]],

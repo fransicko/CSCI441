@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['objects_2ehpp',['objects.hpp',['../objects_8hpp.html',1,'']]],
-  ['openglutils',['OpenGLUtils',['../class_c_s_c_i441_1_1_open_g_l_utils.html',1,'CSCI441']]],
-  ['openglutils_2ehpp',['OpenGLUtils.hpp',['../_open_g_l_utils_8hpp.html',1,'']]]
+  ['enableautogeneratenormals',['enableAutoGenerateNormals',['../class_c_s_c_i441_1_1_model_loader.html#a202848314c149e59b5211858ff082072',1,'CSCI441::ModelLoader']]],
+  ['enabledebugmessages',['enableDebugMessages',['../class_c_s_c_i441_1_1_shader_program.html#aa7cf75ce6605ac1f6ca660f98b88ebba',1,'CSCI441::ShaderProgram']]]
 ];

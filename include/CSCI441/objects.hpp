@@ -1,8 +1,8 @@
 /** @file objects.hpp
   * @brief Helper functions to draw 3D OpenGL 2.1 objects
 	* @author Dr. Jeffrey Paone
-	* @date Last Edit: 19 Sep 2017
-	* @version 1.0.1
+	* @date Last Edit: 25 Oct 2017
+	* @version 1.3
 	*
 	* @copyright MIT License Copyright (c) 2017 Dr. Jeffrey Paone
 	*
@@ -12,6 +12,10 @@
 	*
 	*	@warning NOTE: This header file will only work with OpenGL 2.1
   */
+
+#ifdef __CSCI441_OBJECTS_3_HPP__
+#error cannot include both CSCI441/objects.h and CSCI441/objects3.h
+#else
 
 #ifndef __CSCI441_OBJECTS_HPP__
 #define __CSCI441_OBJECTS_HPP__
@@ -118,7 +122,7 @@ namespace CSCI441 {
 			*	@param GLdouble outer		- radius from the center of the disk to the center of the ring
 			* @param GLint slices			- resolution of the number of steps rotated along the disk
 			* @param GLint rings			- resolution of the number of steps to take along the disk width
-			* @pre inner is greater than zero
+			* @pre inner is greater than or equal to zero
 			* @pre outer is greater than zero
 			* @pre outer is greater than inner
 			* @pre slices is greater than two
@@ -133,7 +137,7 @@ namespace CSCI441 {
 			*	@param GLdouble outer		- radius from the center of the disk to the center of the ring
 			* @param GLint slices			- resolution of the number of steps rotated along the disk
 			* @param GLint rings			- resolution of the number of steps to take along the disk width
-			* @pre inner is greater than zero
+			* @pre inner is greater than or equal to zero
 			* @pre outer is greater than zero
 			* @pre outer is greater than inner
 			* @pre slices is greater than two
@@ -151,7 +155,7 @@ namespace CSCI441 {
 			* @param GLint rings			- resolution of the number of steps to take along the disk width
 			*	@param GLdouble start		- angle in degrees to start the disk at
 			*	@param GLdouble sweep		- distance in degrees to rotate through
-			* @pre inner is greater than zero
+			* @pre inner is greater than or equal to zero
 			* @pre outer is greater than zero
 			* @pre outer is greater than inner
 			* @pre slices is greater than two
@@ -170,7 +174,7 @@ namespace CSCI441 {
 			* @param GLint rings			- resolution of the number of steps to take along the disk width
 			*	@param GLdouble start		- angle in degrees to start the disk at
 			*	@param GLdouble sweep		- distance in degrees to rotate through
-			* @pre inner is greater than zero
+			* @pre inner is greater than or equal to zero
 			* @pre outer is greater than zero
 			* @pre outer is greater than inner
 			* @pre slices is greater than two
@@ -495,10 +499,10 @@ inline void CSCI441_INTERNAL::drawCylinder( GLdouble base, GLdouble top, GLdoubl
 				for( int sliceNum = 0; sliceNum <= slices; sliceNum++ ) {
 					glNormal3f( cos( sliceNum * sliceStep ), 0.0f, sin( sliceNum * sliceStep ) );
 
-					glTexCoord2f( cos( sliceNum * sliceStep ), (double)stackNum / stacks );
+					glTexCoord2f( (double)sliceNum / slices, (double)stackNum / stacks );
 					glVertex3f( cos( sliceNum * sliceStep )*botRadius, stackNum     * stackStep, sin( sliceNum * sliceStep )*botRadius );
 
-					glTexCoord2f( cos( sliceNum * sliceStep ), (double)(stackNum+1) / stacks );
+					glTexCoord2f( (double)sliceNum / slices, (double)(stackNum+1) / stacks );
 					glVertex3f( cos( sliceNum * sliceStep )*topRadius, (stackNum+1) * stackStep, sin( sliceNum * sliceStep )*topRadius );
 				}
 			}; glEnd();
@@ -508,14 +512,14 @@ inline void CSCI441_INTERNAL::drawCylinder( GLdouble base, GLdouble top, GLdoubl
 }
 
 inline void CSCI441_INTERNAL::drawPartialDisk( GLdouble inner, GLdouble outer, GLint slices, GLint rings, GLdouble start, GLdouble sweep, GLenum renderMode ) {
-	double sliceStep = (sweep - start) / slices;
+	double sliceStep = sweep / slices;
 	double ringStep = (outer - inner) / rings;
 
 	glPushAttrib( GL_POLYGON_BIT ); {
 
 		glPolygonMode( GL_FRONT_AND_BACK, renderMode );
 
-		for( int ringNum = 0; ringNum < rings-1; ringNum++ ) {
+		for( int ringNum = 0; ringNum < rings; ringNum++ ) {
 			double currRadius = inner + ringNum*ringStep;
 			double nextRadius = inner + (ringNum+1)*ringStep;
 
@@ -550,14 +554,14 @@ inline void CSCI441_INTERNAL::drawSphere( GLdouble radius, GLint stacks, GLint s
 			double phiNext = stackStep * (stacks-1);
 
 			glNormal3f( 0.0f, 1.0f, 0.0f );
-			glTexCoord2f( 1.0f, 1.0f );
+			glTexCoord2f( 0.5f, 1.0f );
 			glVertex3f( 0.0f, -cos( phi )*radius, 0.0f );
 
 			for( int sliceNum = 0; sliceNum <= slices; sliceNum++ ) {
 				double theta = sliceStep * sliceNum;
 
 				glNormal3f( -cos( theta )*sin( phiNext ),        -cos( phiNext ),        sin( theta )*sin( phiNext )        );
-				glTexCoord2f( -cos( theta )*sin( phiNext ), -cos( phiNext ) );
+				glTexCoord2f( (stacks-1.0f) / stacks, sliceNum / slices );
 				glVertex3f( -cos( theta )*sin( phiNext )*radius, -cos( phiNext )*radius, sin( theta )*sin( phiNext )*radius );
 			}
 		}; glEnd();
@@ -571,12 +575,12 @@ inline void CSCI441_INTERNAL::drawSphere( GLdouble radius, GLint stacks, GLint s
 				for( int sliceNum = slices; sliceNum >= 0; sliceNum-- ) {
 					double theta = sliceStep * sliceNum;
 
-					glNormal3f( -cos( theta )*sin( phi ),            -cos( phi )*radius,     sin( theta )*sin( phi )            );
-					glTexCoord2f( -cos( theta )*sin( phi ),     -cos( phi ) );
+					glNormal3f( -cos( theta )*sin( phi ),            -cos( phi ),     sin( theta )*sin( phi )            );
+					glTexCoord2f( stackNum / sphereData.st,     sliceNum / sphereData.sl );
 					glVertex3f( -cos( theta )*sin( phi )*radius,     -cos( phi )*radius,     sin( theta )*sin( phi )*radius     );
 
-					glNormal3f( -cos( theta )*sin( phiNext ),        -cos( phiNext )*radius, sin( theta )*sin( phiNext )        );
-					glTexCoord2f( -cos( theta )*sin( phiNext ), -cos( phiNext ) );
+					glNormal3f( -cos( theta )*sin( phiNext ),        -cos( phiNext ), sin( theta )*sin( phiNext )        );
+					glTexCoord2f( (stackNum+1) / sphereData.st, sliceNum / sphereData.sl );
 					glVertex3f( -cos( theta )*sin( phiNext )*radius, -cos( phiNext )*radius, sin( theta )*sin( phiNext )*radius );
 				}
 			}; glEnd();
@@ -588,14 +592,14 @@ inline void CSCI441_INTERNAL::drawSphere( GLdouble radius, GLint stacks, GLint s
 			double phiNext = stackStep;
 
 			glNormal3f( 0.0f, -1.0f, 0.0f );
-			glTexCoord2f( 0.0f, 0.0f );
+			glTexCoord2f( 0.5f, 0.0f );
 			glVertex3f( 0.0f, -cos( phi )*radius, 0.0f );
 
 			for( int sliceNum = slices; sliceNum >= 0; sliceNum-- ) {
 				double theta = sliceStep * sliceNum;
 
 				glNormal3f( -cos( theta )*sin( phiNext ),        -cos( phiNext ),        sin( theta )*sin( phiNext )        );
-				glTexCoord2f( -cos( theta )*sin( phiNext ), -cos( phiNext ) );
+				glTexCoord2f( 1.0f / stacks, sliceNum / slices );
 				glVertex3f( -cos( theta )*sin( phiNext )*radius, -cos( phiNext )*radius, sin( theta )*sin( phiNext )*radius );
 			}
 		}; glEnd();
@@ -643,3 +647,4 @@ inline void CSCI441_INTERNAL::drawTorus( GLdouble innerRadius, GLdouble outerRad
 }
 
 #endif // __CSCI441_OBJECTS_HPP__
+#endif // #ifndef __CSCI441_OBJECTS_3_HPP__

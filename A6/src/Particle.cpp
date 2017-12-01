@@ -36,7 +36,6 @@ void Particle::update(double time) {
 }
 
 void Particle::draw(GLint &snow_size, GLuint &pointsVAO, GLuint &pointsVBO, GLuint textureHandle) {
-	std::cout << "\n Its in the draw for particle" << std::endl;
 	
 	point[0] = { position.x, position.y, position.z };
 	glUniform1f(snow_size, 1.0f - (float)(currentAge / maxLife));

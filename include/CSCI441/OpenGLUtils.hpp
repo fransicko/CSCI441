@@ -1,16 +1,20 @@
 /** @file OpenGLUtils.hpp
-  * @brief Helper functions to work with OpenGL
+  * @brief Helper functions to work with OpenGL 2.1
 	* @author Dr. Jeffrey Paone
-	* @date Last Edit: 21 Sep 2017
-	* @version 1.2
+	* @date Last Edit: 25 Oct 2017
+	* @version 1.3
 	*
 	* @copyright MIT License Copyright (c) 2017 Dr. Jeffrey Paone
 	*
 	*	These functions, classes, and constants help minimize common
 	*	code that needs to be written.
 	*
-	*	@warning NOTE: This header file will depends upon glm
+	*	@warning NOTE: This header file depends upon glm
   */
+
+#ifdef __CSCI441_OPENGLUTILS_3_H__
+#error cannot include both CSCI441/OpenGLUtils.h and CSCI441/OpenGLUtils3.h
+#else
 
 #ifndef __CSCI441_OPENGLUTILS_H__
 #define __CSCI441_OPENGLUTILS_H__
@@ -50,18 +54,14 @@ namespace CSCI441 {
 		  */
 		void popMatrix( glm::mat4 mtx );
 
-    /** @class OpenGLUtils
-      * @brief static class containing OpenGL Utilities
+		/** @namespace OpenGLUtils
+      * @brief contains OpenGL Utility functions
       */
-    class OpenGLUtils {
-    	public:
-        /** @brief Prints information about our OpenGL context
+    namespace OpenGLUtils {
+    	  /** @brief Prints information about our OpenGL context
           *
           */
-    		static void printOpenGLInfo();
-
-    	private:
-    		OpenGLUtils();
+    		void printOpenGLInfo();
   	};
 
 		/** @struct MaterialStruct
@@ -129,13 +129,10 @@ inline void CSCI441::OpenGLUtils::printOpenGLInfo() {
 	if( (major >= 2 && minor >= 0) || major > 2 ) {
 		CSCI441_INTERNAL::printOpenGLParamHeader( 2, 0 );
 		CSCI441_INTERNAL::printOpenGLParam( "[INFO]: |   Max # Lights:    %35d |\n", 									GL_MAX_LIGHTS );
-		//CSCI441_INTERNAL::printOpenGLParam( "[INFO]: |   Max # Color Attachments:  %26d |\n", 				GL_MAX_COLOR_ATTACHMENTS );
 	}
 
 	fprintf( stdout, "[INFO]: \\--------------------------------------------------------/\n\n");
 }
-
-inline CSCI441::OpenGLUtils::OpenGLUtils() {}
 
 inline void CSCI441::setMaterial( MaterialStruct material ) {
 	glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, &material.diffuseColor[0] );
@@ -179,3 +176,4 @@ inline void CSCI441_INTERNAL::printOpenGLParam4( const char *format, GLenum name
 }
 
 #endif // __CSCI441_OPENGLUTILS_H__
+#endif // #ifdef __CSCI441_OPENGLUTILS_3_H__

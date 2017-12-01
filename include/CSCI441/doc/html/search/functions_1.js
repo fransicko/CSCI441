@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['popmatrix',['popMatrix',['../namespace_c_s_c_i441.html#ae423b2406df96b1cafe485245e4f9203',1,'CSCI441']]],
-  ['printopenglinfo',['printOpenGLInfo',['../class_c_s_c_i441_1_1_open_g_l_utils.html#a23e011241f0e95738bafa0b0404eb679',1,'CSCI441::OpenGLUtils']]],
-  ['pushmatrix',['pushMatrix',['../namespace_c_s_c_i441.html#aa818e8189c42c50e88d6d0512274bcfb',1,'CSCI441']]]
+  ['enableautogeneratenormals',['enableAutoGenerateNormals',['../class_c_s_c_i441_1_1_model_loader.html#a202848314c149e59b5211858ff082072',1,'CSCI441::ModelLoader']]],
+  ['enabledebugmessages',['enableDebugMessages',['../class_c_s_c_i441_1_1_shader_program.html#aa7cf75ce6605ac1f6ca660f98b88ebba',1,'CSCI441::ShaderProgram']]]
 ];

@@ -37,7 +37,9 @@ ParticleSystem::ParticleSystem( char s, glm::vec3 e, double a,
 
 void ParticleSystem::update() {
 	// LOOKHERE #2
-	part.clear();
+	if (part.size() != 0 && part.at(0).currentAge >= part.at(0).maxLife) {
+		part.erase(part.begin(), part.begin() + num_part);
+	}
 	float nAngle = (2*M_PI) / num_part;
 	float xzAngle = nAngle;
 	for( int i = 0; i < num_part; i++ ) {

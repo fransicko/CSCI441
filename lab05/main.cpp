@@ -302,7 +302,7 @@ void setupTextures() {
 	unsigned char* imageData;
 	
 	CSCI441::loadPPM("textures/brick.ppm", width, height, imageData);
-	// TODO #2a: call the registerOpenGLTexture() function unsigned char *textureData,unsigned int texWidth, unsigned int texHeight,GLuint &textureHandle)
+	// TODO #2a: call the registerOpenGLTextureregisterOpenGLTexture() function unsigned char *textureData,unsigned int texWidth, unsigned int texHeight,GLuint &textureHandle)
 	registerOpenGLTexture(imageData, (unsigned int) width, (unsigned int) height, brickTexHandle);
 
 

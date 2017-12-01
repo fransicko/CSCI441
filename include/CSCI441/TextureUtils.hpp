@@ -23,6 +23,9 @@
 
 #include <stdio.h>
 
+#include <string>
+using namespace std;
+
 ////////////////////////////////////////////////////////////////////////////////////
 
 /** @namespace CSCI441
@@ -33,6 +36,31 @@ namespace CSCI441 {
 	  * @brief OpenGL Texture Utility functions
 	  */
 	namespace TextureUtils {
+		/**	@brief loads a BMP into memory
+			*
+			*  This function reads an ASCII BMP, returning true if the function succeeds and
+			*      false if it fails. If it succeeds, the variables imageWidth and
+			*      imageHeight will hold the width and height of the read image, respectively.
+			*
+			*  It's not terribly robust.
+			*
+			*  Returns the image as an unsigned character array containing
+			*      imageWidth*imageHeight*3 entries (for that many bytes of storage).
+			*
+			*  NOTE: this function expects imageData to be UNALLOCATED, and will allocate
+			*      memory itself. If the function fails (returns false), imageData
+			*      will be set to NULL and any allocated memory will be automatically deallocated.
+			*
+			*	@param[in] const char* filename	- filename of the image to load
+			* @param[out] int &imageWidth			-	will contain the image width upon successful completion
+			* @param[out] int &imageHeight		- will contain the image height upon successful completion
+			* @param[out] unsigned char* &imageData - will contain the RGB data upon successful completion
+			* @param[in] const char* path 		- path to where file is stored.  defaults to current directory
+			* @pre imageData is unallocated
+			* @return bool - true if loading succeeded, false otherwise
+			*/
+		bool loadBMP( const char* filename, int &imageWidth, int &imageHeight, int &imageChannels, unsigned char* imageData, const char* path = "./" );
+
 		/**	@brief loads a PPM into memory
 			*
 			*  This function reads an ASCII PPM, returning true if the function succeeds and
@@ -116,6 +144,89 @@ namespace CSCI441 {
 ////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 // Outward facing function implementations
+
+inline bool CSCI441::TextureUtils::loadBMP( const char* filename, int &imageWidth, int &imageHeight, int &imageChannels, unsigned char* imageData, const char* path ) {
+	FILE *file;
+	unsigned long size;                 // size of the image in bytes.
+	size_t i;							// standard counter.
+	unsigned short int planes;          // number of planes in image (must be 1)
+	unsigned short int bpp;             // number of bits per pixel (must be 24)
+	char temp;                          // used to convert bgr to rgb color.
+
+	// make sure the file is there.
+	if ((file = fopen(filename, "rb"))==NULL) {
+		string folderName = string(path) + string(filename);
+		if ((file = fopen(folderName.c_str(), "rb")) == NULL ) {
+			printf("[.bmp]: [ERROR]: File Not Found: %s\n",filename);
+			return false;
+		}
+	}
+
+	// seek through the bmp header, up to the width/height:
+	fseek(file, 18, SEEK_CUR);
+
+	// read the width
+	if ((i = fread(&imageWidth, 4, 1, file)) != 1) {
+		printf("[.bmp]: [ERROR]: reading width from %s.\n", filename);
+		return false;
+	}
+	//printf("Width of %s: %lu\n", filename, image->sizeX);
+
+	// read the height
+	if ((i = fread(&imageHeight, 4, 1, file)) != 1) {
+		printf("[.bmp]: [ERROR]: reading height from %s.\n", filename);
+		return false;
+	}
+	//printf("Height of %s: %lu\n", filename, image->sizeY);
+
+	// calculate the size (assuming 24 bits or 3 bytes per pixel).
+	size = imageWidth * imageHeight * 3;
+
+	// read the planes
+	if ((fread(&planes, 2, 1, file)) != 1) {
+		printf("[.bmp]: [ERROR]: reading planes from %s.\n", filename);
+		return false;
+	}
+	if (planes != 1) {
+		printf("[.bmp]: [ERROR]: Planes from %s is not 1: %u\n", filename, planes);
+		return false;
+	}
+
+	// read the bpp
+	if ((i = fread(&bpp, 2, 1, file)) != 1) {
+		printf("[.bmp]: [ERROR]: reading bpp from %s.\n", filename);
+		return false;
+	}
+	if (bpp != 24) {
+		printf("[.bmp]: [ERROR]: Bpp from %s is not 24: %u\n", filename, bpp);
+		return false;
+	}
+
+	// seek past the rest of the bitmap header.
+	fseek(file, 24, SEEK_CUR);
+
+	// read the data.
+	imageData = (unsigned char *) malloc(size);
+	if (imageData == NULL) {
+		printf("[.bmp]: [ERROR]: allocating memory for color-corrected image data");
+		return false;
+	}
+
+	if ((i = fread(imageData, size, 1, file)) != 1) {
+		printf("[.bmp]: [ERROR]: reading image data from %s.\n", filename);
+		return false;
+	}
+
+	for (i=0;i<size;i+=3) { // reverse all of the colors. (bgr -> rgb)
+		temp = imageData[i];
+		imageData[i] = imageData[i+2];
+		imageData[i+2] = temp;
+	}
+
+	imageChannels = 3;
+
+	return true;
+}
 
 inline bool CSCI441::TextureUtils::loadPPM( const char *filename, int &imageWidth, int &imageHeight, unsigned char* &imageData ) {
     FILE *fp = fopen(filename, "r");

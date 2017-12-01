@@ -24,6 +24,7 @@ for the JavaScript code in this file
 var NAVTREE =
 [
   [ "CSCI441 Library", "index.html", [
+    [ "Deprecated List", "deprecated.html", null ],
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ],
       [ "Namespace Members", "namespacemembers.html", [
@@ -47,7 +48,7 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"_open_g_l_utils_8hpp.html"
+"_framebuffer_utils3_8hpp.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

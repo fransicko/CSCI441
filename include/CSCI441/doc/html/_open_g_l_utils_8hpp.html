@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.14"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CSCI441 Library: OpenGLUtils.hpp File Reference</title>
+<title>CSCI441 Library: CSCI441/OpenGLUtils.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,9 +30,9 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">CSCI441 Library
-   &#160;<span id="projectnumber">v1.1</span>
+   &#160;<span id="projectnumber">v1.7</span>
    </div>
-   <div id="projectbrief">Helper functions for CSCI441</div>
+   <div id="projectbrief">Helper functions for CSCI441 Computer Graphics</div>
   </td>
  </tr>
  </tbody>
@@ -88,7 +88,6 @@ $(document).ready(function(){initNavTree('_open_g_l_utils_8hpp.html','');});
 
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
@@ -96,7 +95,7 @@ $(document).ready(function(){initNavTree('_open_g_l_utils_8hpp.html','');});
 </div><!--header-->
 <div class="contents">
 
-<p>Helper functions to work with OpenGL.  
+<p>Helper functions to work with OpenGL 2.1.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;GL/gl.h&gt;</code><br />
 <code>#include &lt;glm/glm.hpp&gt;</code><br />
@@ -104,16 +103,13 @@ $(document).ready(function(){initNavTree('_open_g_l_utils_8hpp.html','');});
 </div>
 <p><a href="_open_g_l_utils_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_s_c_i441_1_1_open_g_l_utils.html">CSCI441::OpenGLUtils</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">static class containing OpenGL Utilities  <a href="class_c_s_c_i441_1_1_open_g_l_utils.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 Namespaces</h2></td></tr>
 <tr class="memitem:namespace_c_s_c_i441"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_c_s_c_i441.html">CSCI441</a></td></tr>
 <tr class="memdesc:namespace_c_s_c_i441"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="namespace_c_s_c_i441.html" title="CSCI441 Helper Functions for OpenGL. ">CSCI441</a> Helper Functions for OpenGL. <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:namespace_open_g_l_utils"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_open_g_l_utils.html">OpenGLUtils</a></td></tr>
+<tr class="memdesc:namespace_open_g_l_utils"><td class="mdescLeft">&#160;</td><td class="mdescRight">contains OpenGL Utility functions <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -124,21 +120,55 @@ Functions</h2></td></tr>
 <tr class="memitem:ae423b2406df96b1cafe485245e4f9203"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_c_s_c_i441.html#ae423b2406df96b1cafe485245e4f9203">CSCI441::popMatrix</a> (glm::mat4 mtx)</td></tr>
 <tr class="memdesc:ae423b2406df96b1cafe485245e4f9203"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multiplies current matrix by inverse of given matrix.  <a href="namespace_c_s_c_i441.html#ae423b2406df96b1cafe485245e4f9203">More...</a><br /></td></tr>
 <tr class="separator:ae423b2406df96b1cafe485245e4f9203"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23e011241f0e95738bafa0b0404eb679"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_open_g_l_utils_8hpp.html#a23e011241f0e95738bafa0b0404eb679">CSCI441::OpenGLUtils::printOpenGLInfo</a> ()</td></tr>
+<tr class="memdesc:a23e011241f0e95738bafa0b0404eb679"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prints information about our OpenGL context.  <a href="_open_g_l_utils_8hpp.html#a23e011241f0e95738bafa0b0404eb679">More...</a><br /></td></tr>
+<tr class="separator:a23e011241f0e95738bafa0b0404eb679"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac201d649430f0c55e57db10b0dddd100"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_c_s_c_i441.html#ac201d649430f0c55e57db10b0dddd100">CSCI441::setMaterial</a> (MaterialStruct material)</td></tr>
+<tr class="memdesc:ac201d649430f0c55e57db10b0dddd100"><td class="mdescLeft">&#160;</td><td class="mdescRight">sets all material properties at once  <a href="namespace_c_s_c_i441.html#ac201d649430f0c55e57db10b0dddd100">More...</a><br /></td></tr>
+<tr class="separator:ac201d649430f0c55e57db10b0dddd100"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Helper functions to work with OpenGL. </p>
+<div class="textblock"><p>Helper functions to work with OpenGL 2.1. </p>
 <dl class="section author"><dt>Author</dt><dd>Dr. Jeffrey Paone </dd></dl>
-<dl class="section date"><dt>Date</dt><dd>Last Edit: 21 Sep 2017 </dd></dl>
-<dl class="section version"><dt>Version</dt><dd>1.1</dd></dl>
+<dl class="section date"><dt>Date</dt><dd>Last Edit: 25 Oct 2017 </dd></dl>
+<dl class="section version"><dt>Version</dt><dd>1.3</dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>MIT License Copyright (c) 2017 Dr. Jeffrey Paone</dd></dl>
-<p>These functions</p>
-<dl class="section warning"><dt>Warning</dt><dd>NOTE: This header file will depends upon glm </dd></dl>
-</div></div><!-- contents -->
+<p>These functions, classes, and constants help minimize common code that needs to be written.</p>
+<dl class="section warning"><dt>Warning</dt><dd>NOTE: This header file depends upon glm </dd></dl>
+</div><h2 class="groupheader">Function Documentation</h2>
+<a id="file_a23e011241f0e95738bafa0b0404eb679"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#file_a23e011241f0e95738bafa0b0404eb679">&#9670;&nbsp;</a></span>printOpenGLInfo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CSCI441::OpenGLUtils::printOpenGLInfo </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Prints information about our OpenGL context. </p>
+
+</div>
+</div>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="_open_g_l_utils_8hpp.html">OpenGLUtils.hpp</a></li>
+    <li class="navelem"><a class="el" href="dir_00b3eae77e1f3012f8d6fd053c504834.html">CSCI441</a></li><li class="navelem"><a class="el" href="_open_g_l_utils_8hpp.html">OpenGLUtils.hpp</a></li>
     <li class="footer">Generated by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.14 </li>
